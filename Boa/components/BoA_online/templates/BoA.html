@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Book of Abstracts {{ conference_acronym+' '+year }}</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('BoAonline.abstract', ID='plenary') }}" target="iframe">Plenary Lecture</a></li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Talks<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                {% for abstract in talks %}
+                    <li><a href="{{ url_for('BoAonline.abstract', ID=abstract.label) }}" target="iframe">{{ abstract.label + ' ' + abstract.time_slot }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Poster<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                {% for abstract in poster %}
+                    <li><a href="{{ url_for('BoAonline.abstract', ID=abstract.label) }}" target="iframe">{{ abstract.label }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><a href="{{ url_for('BoAonline.abstract_list') }}" target="iframe">Abstract List</a></li>
+        </ul>
+    </div>
+</nav>
+
+<iframe id="iframe" name="iframe" style="width: 100%;" src="{{ url_for('BoAonline.abstract_list') }}" frameborder="0" scrolling="no"></iframe>
+
+<script src="{{ url_for('static', filename='jquery.responsiveiframe.onclick.js') }}"></script>
+<script>
+  ;(function($){
+      $(function(){
+        $('#iframe').responsiveIframe({ xdomain: '*'});
+      });
+  })(jQuery);
+
+</script>
+{% endblock %}

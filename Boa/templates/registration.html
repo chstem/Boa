@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">
+        <h2 class="text-center">Registration Deadline: {{ deadline_registration }}</h2>
+</div>
+
+<br />
+
+{% block registration_form %}{% endblock %}
+
+{% if rank == 'participant' %}
+    <div class="container">
+        <div class="jumbotron">
+            <p>Please transfer the conference fee after registration to the following bank account until {{ deadline_payment }}!</p>
+            Account holder: {{ account.holder }}<br />
+            {% if ID %}
+                Reference/Verwendungszweck: {{ account.reference.replace('[ID]', ID) }}<br />
+            {% else %}
+                Reference/Verwendungszweck: {{ account.reference.replace('[ID]', '[your personal ID that you received after registration]') }} <br />
+            {% endif %}
+            Bank: {{ account.bank }}<br />
+            SWIFT-BIC: {{ account.SWIFT }}<br />
+            IBAN: {{ account.IBAN }}<br />
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

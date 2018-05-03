@@ -1,0 +1,318 @@
+{% if col_0 is not defined %}
+    {% set col_0 = 'col-sm-4 col-md-2 col-lg-2' %}
+{% endif %}
+{% if col_1 is not defined %}
+    {% set col_1 = 'col-sm-8 col-md-10 col-lg-10' %}
+{% endif %}
+{% if col_2 is not defined %}
+    {% set col_2 = 'col-sm-0 col-md-0 col-lg-0' %}
+{% endif %}
+
+{% macro start_wrap(col0=0, label='') %}
+
+    {# change col ratio #}
+        {% if col0 %}
+            {% set _col_0 = 'col-sm-' + col0|string %}
+            {% set _col_1 = 'col-sm-' + (12-col0)|string %}
+        {% else %}
+            {% set _col_0 = col_0 %}
+            {% set _col_1 = col_1 %}
+        {% endif %}
+
+    <div class="form-group">
+        {% if label %}
+            <label class="{{ _col_0 }} control-label">{{ label }} </label>
+        {% else %}
+            <div class="{{ _col_0 }}"></div>
+        {% endif %}
+        <div class="{{ _col_1 }}">
+
+{% endmacro %}
+
+{% macro end_wrap(col0=0) %}
+
+    {# change col ratio #}
+        {% if col0 %}
+            {% set _col_2 = 'col-sm-0' %}
+        {% else %}
+            {% set _col_2 = col_2 %}
+        {% endif %}
+
+        </div>
+        <div class="{{ _col_2 }}"></div>
+    </div>
+
+{% endmacro %}
+
+{% macro wrap_tag(html, col0=0) %}
+
+    {{ start_wrap(col0=col0) }}
+    {{ html|safe }}
+    {{ end_wrap(col0=col0) }}
+
+{% endmacro %}
+
+{% macro render_field(field, hide_label=False, class='', labelclass='', groupclass='', help='', wrapped=True, col0=0) %}
+
+    {# change col ratio #}
+        {% if col0 %}
+            {% set _col_0 = 'col-sm-' + col0|string %}
+            {% set _col_1 = 'col-sm-' + (12-col0)|string %}
+            {% set _col_2 = 'col-sm-0' %}
+        {% else %}
+            {% set _col_0 = col_0 %}
+            {% set _col_1 = col_1 %}
+            {% set _col_2 = col_2 %}
+        {% endif %}
+
+    {# set labels #}
+        {% set group_class = 'form-group' %}
+        {% if groupclass %}
+            {% set group_class = group_class + ' ' + groupclass %}
+        {% endif %}
+
+        {% set label_class = 'control-label' %}
+        {% if wrapped %}
+            {% set label_class = label_class + ' ' + _col_0 %}
+        {% endif %}
+        {% if hide_label %}
+            {% set label_class = label_class + ' sr-only' %}
+        {% endif %}
+        {% if labelclass %}
+            {% set label_class = label_class + ' ' + labelclass %}
+        {% endif %}
+
+        {% set field_class = 'form-control' %}
+        {% if class %}
+            {% set field_class = field_class + ' ' + class %}
+        {% endif %}
+
+    {# add info about errors #}
+        {% if field.errors %}
+            {% set group_class = group_class + ' has-error' %}
+            {% set data_toggle = 'tooltip' %}
+            {% set title = field.errors|join(', ') %}
+        {% else %}
+            {% set data_toggle = '' %}
+            {% set title = '' %}
+        {% endif %}
+
+    {# wrap in form-group #}
+        <div class="{{ group_class }}">
+
+    {# render field #}
+        {{ field.label(required=field.flags.required, class=label_class) }}
+        {% if wrapped %}
+            <div class="{{ _col_1 }}">
+        {% endif %}
+            {{ field(class=field_class, data_toogle=data_toogle, title=title, **kwargs)|safe }}
+            {% if help %}
+                <span class="help-block">{{ help }}</span>
+            {% endif %}
+        {% if wrapped %}
+            </div>
+            <div class="{{ _col_2 }}"></div>
+        {% endif %}
+
+    {# close form-group #}
+        </div>
+
+{% endmacro %}
+
+{% macro render_radios(radios, help='', col0=0, inline=False, padding_right='') %}
+
+    {# change col ratio #}
+        {% if col0 %}
+            {% set _col_0 = 'col-sm-' + col0|string %}
+            {% set _col_1 = 'col-sm-' + (12-col0)|string %}
+            {% set _col_2 = 'col-sm-0' %}
+        {% else %}
+            {% set _col_0 = col_0 %}
+            {% set _col_1 = col_1 %}
+            {% set _col_2 = col_2 %}
+        {% endif %}
+
+    {# add info about errors #}
+        {% if radios.errors %}
+            {% set group_class = 'form-group has-error' %}
+            {% set label_class = 'has-error' %}
+            {% set data_toggle = 'tooltip' %}
+            {% set title = radios.errors|join(', ') %}
+        {% else %}
+            {% set group_class = 'form-group' %}
+            {% set label_class = '' %}
+            {% set data_toggle = '' %}
+            {% set title = '' %}
+        {% endif %}
+
+    {% if inline %}
+        {% set label_class = label_class + ' radio-inline' %}
+    {% endif %}
+
+    {% set label_style = '' %}
+    {% if padding_right %}
+        {% set label_style = label_style + 'padding-right:%ipx;' %padding_right %}
+    {% endif %}
+
+    <div class="{{ group_class }}">
+        {{ radios.label(class=_col_0 + ' control-label', data_toogle=data_toogle, title=title) }}
+        <div class="{{ _col_1 }}">
+
+            {% if inline %}
+
+                <div>
+                {% for radio in radios %}
+                    <label class="{{ label_class }}" style="{{ label_style }}">{{ radio( **kwargs)|safe }}{{ radio.label.text }}</label>
+                {% endfor %}
+                </div>
+
+            {% else %}
+
+                {% for radio in radios %}
+                    <div class="radio" data_toogle="{{ data_toogle }}" title="{{ title }}">
+                        <label class="{{ label_class }}">{{ radio(**kwargs)|safe }}{{ radio.label.text }}</label>
+                    </div>
+                {% endfor %}
+
+            {% endif %}
+
+            {% if help %}
+                <span class="help-block">{{ help }}</span>
+            {% endif %}
+
+        </div>
+<!--         <div class="{{ _col_2 }}"></div> -->
+    </div>
+
+{% endmacro %}
+
+{% macro render_checkbox(field, inline=False, text='', help='') %}
+
+    {# set parameters #}
+        {% if text %}
+            {% set label_text = text|safe %}
+        {% else %}
+            {% set label_text = field.label.text %}
+        {% endif %}
+
+    {# add info about errors #}
+        {% if field.errors %}
+            {% set class = 'checkbox has-error' %}
+            {% set data_toggle = 'tooltip' %}
+            {% set title = field.errors|join(', ') %}
+        {% else %}
+            {% set class = 'checkbox' %}
+            {% set data_toggle = '' %}
+            {% set title = '' %}
+        {% endif %}
+
+    {# render field #}
+    {% if inline %}
+        <label class="checkbox-inline" data_toggle="{{ data_toggle }}" title="{{ title }}">{{ field(data_toogle=data_toogle, title=title, **kwargs)|safe }}{{ label_text }}</label>
+            {% if help %}
+                <span class="help-block text-justify">{{ help }}</span>
+            {% endif %}
+    {% else %}
+        <div class="{{ class }}">
+            <label data_toggle="{{ data_toggle }}" title="{{ title }}">{{ field(data_toogle=data_toogle, title=title, **kwargs)|safe }}{{ label_text }}</label>
+            {% if help %}
+                <span class="help-block text-justify">{{ help }}</span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+{% endmacro %}
+
+{% macro render_multicheckbox(field, inline=False, text='', help='', wrapped=True, col0=0) %}
+
+    {# change col ratio #}
+        {% if col0 %}
+            {% set _col_0 = 'col-sm-' + col0|string %}
+            {% set _col_1 = 'col-sm-' + (12-col0)|string %}
+            {% set _col_2 = 'col-sm-0' %}
+        {% else %}
+            {% set _col_0 = col_0 %}
+            {% set _col_1 = col_1 %}
+            {% set _col_2 = col_2 %}
+        {% endif %}
+
+    {% set label_class = 'control-label' %}
+    {% if wrapped %}
+        {% set label_class = label_class + ' ' + _col_0 %}
+    {% endif %}
+    {% if hide_label %}
+        {% set label_class = label_class + ' sr-only' %}
+    {% endif %}
+    {% if labelclass %}
+        {% set label_class = label_class + ' ' + labelclass %}
+    {% endif %}
+
+    {% set field_class = '' %}
+    {% if class %}
+        {% set field_class = field_class + ' ' + class %}
+    {% endif %}
+
+    {% if inline %}
+        {% set divclass = '' %}
+    {% else %}
+        {% set divclass = 'checkbox' %}
+    {% endif %}
+
+    {# add info about errors #}
+        {% if field.errors %}
+            {% set divclass = divclass + ' has-error' %}
+            {% set data_toggle = 'tooltip' %}
+            {% set title = field.errors|join(', ') %}
+        {% else %}
+            {% set data_toggle = '' %}
+            {% set title = '' %}
+        {% endif %}
+
+    {# render fields #}
+
+        {# wrap in form-group #}
+        <div class="form-group">
+
+        {{ field.label(required=field.flags.required, class=label_class, data_toogle=data_toogle, title=title) }}
+
+        {% if wrapped %}
+            <div class="{{ _col_1 }}">
+        {% endif %}
+
+        {% if inline %}
+
+            <div class="{{ divclass }}">
+            {% for checkbox in field %}
+                <label class="checkbox-inline" data_toggle="{{ data_toggle }}" title="{{ title }}">{{ checkbox(data_toogle=data_toogle, title=title, **kwargs)|safe }}{{ checkbox.label.text }}</label>
+            {% endfor %}
+            </div>
+
+        {% else %}
+
+            {% for checkbox in field %}
+                <div class="{{ divclass }}">
+                    <label data_toggle="{{ data_toggle }}" title="{{ title }}">{{ checkbox(data_toogle=data_toogle, title=title, **kwargs)|safe }}{{ checkbox.label.text }}</label>
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+        {% if help %}
+            <span class="help-block text-justify">{{ help }}</span>
+        {% endif %}
+
+        {% if wrapped %}
+            </div>
+            <div class="{{ _col_2 }}"></div>
+        {% endif %}
+
+        {# close form-group #}
+        </div>
+
+{% endmacro %}
+
+{% macro include_csrf_form() %}
+    <form method="post" action="/">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    </form>
+{% endmacro %}

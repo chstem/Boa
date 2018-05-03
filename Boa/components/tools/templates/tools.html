@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">{{ conference_acronym+' '+year }}</a>
+        </div>
+        <ul class="nav navbar-nav">
+            {% for label, subpages in pages %}
+                {% if subpages|length == 1 %}
+                    {% set label, url = subpages[0] %}
+                    <li><a href="{{ url }}" target="iframe">{{ label }}</a></li>
+                {% else %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ label }}<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                        {% for label, url in subpages %}
+                            <li><a href="{{ url }}" target="iframe">{{ label }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</nav>
+
+<iframe id="iframe" name="iframe" style="width: 100%;" src="{{ url_for('stats') }}" frameborder="0" scrolling="no"></iframe>
+
+<script src="https://bcs.jcf-berlin.de/BCS2018/static/jquery.responsiveiframe.onclick.js"></script>
+<script>
+  ;(function($){
+      $(function(){
+        $('#iframe').responsiveIframe({ xdomain: '*'});
+      });
+  })(jQuery);
+
+</script>
+{% endblock %}

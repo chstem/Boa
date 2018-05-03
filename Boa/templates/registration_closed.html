@@ -1,0 +1,18 @@
+{% extends "registration.html" %}
+{% block registration_form %}
+
+<div class="container">
+    <div class="jumbotron">
+        {% if reason == 'full' %}
+            <p class="text-center">All seats are already booked for the {{ conference_acronym }}!</p>
+        {% elif reason == 'deadline' %}
+            <p class="text-center">Sorry, the registration is already closed!</p>
+        {% elif reason == 'notyet' %}
+            <p class="text-center">The registration will be opened on {{ start_registration }}!</p>
+        {% else %}
+            <p class="text-center">The registration is closed!</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

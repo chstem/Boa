@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<!-- load MathJax from CDN with enabled mhchem-->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    },
+    TeX: {
+      extensions: ["mhchem.js"]
+    }
+  });
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+
+    <h1 class="text-center">Help Page</h1>
+
+    <h2>Examples</h2>
+
+    <p>Abstracts can be formatted using <strong>Markdown</strong> as well as <span class="math inline">$\LaTeX$</span> math commands. Please take a look at the examples below.</p>
+
+    <div class="well well-sm">
+        <code>Write **bold** and *italic* text.</code>
+        <blockquote>Write <strong>bold</strong> and <em>italic</em> text.</blockquote>
+    </div>
+
+    <div class="well well-sm">
+        <code>Use super^script^ or sub~script~ in text.</code>
+        <blockquote>Use super<sup>script</sup> or sub<sub>script</sub> in text.</blockquote>
+    </div>
+
+    <div class="well well-sm">
+        <code>For citations you can use footnotes, for example: ^[B. Uthor, et. all, Science, (2010), **12**, 10-15]</code><br /><br />
+        <blockquote>For citations you can use footnotes, for example: <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></blockquote>
+        <section class="footnotes">
+        <hr />
+        <ol>
+        <li id="fn1"><p>B. Uthor, et. all, Science, (2010), <strong>12</strong>, 10-15<a href="#fnref1" class="footnote-back">↩</a></p></li>
+        </ol>
+        </section>
+    </div>
+
+    <div class="well well-sm">
+        <code>Use math and greek letters in LaTeX math environments: $\alpha\beta\gamma$, $\frac{1}{2}$</code>
+        <blockquote>Use math and greek letters in LaTeX math environments: <span class="math inline"><em>α</em><em>β</em><em>γ</em></span>, <span class="math inline">$\frac{1}{2}$</span></blockquote>
+    </div>
+
+    <div class="well well-sm">
+        <code>Use chemical formulae: $\ce{H3O+}$, $\ce{O2-}$, $\ce{O^{2-}}$, $\ce{O_2^{2-}}$, $\ce{^{127}I2}$.</code><br /><br />
+        <blockquote>Use chemical formulae: <span class="math inline">$\ce{H3O+}$</span>, <span class="math inline">$\ce{O2-}$</span>, <span class="math inline">$\ce{O^{2-}}$</span>, <span class="math inline">$\ce{O_2^{2-}}$</span>, <span class="math inline">$\ce{^{127}I2}$</span>.</blockquote>
+    </div>
+
+    <h2>Frequently Asked Questions</h2>
+
+        <p>
+            <strong>Q:</strong> After editing the abstract or author information, the preview pdf will not be updated.
+            <br />
+            <strong>A:</strong> Try clearing your browser cache.
+        </p>
+
+        <p>
+            <strong>Q:</strong> What file types are supported for the figure?
+            <br />
+            <strong>A:</strong> Please upload your figure in one of the following formats: .jpeg (or .jpg), .png, .pdf.
+        </p>
+
+        <p>
+            <strong>Q:</strong> Can I upload more than one figure?
+            <br />
+            <strong>A:</strong> No, when uploading a new figure, the last one will be replaced. If you need two or more figures in your abstract, you can combine them in a single file before uploading.
+        </p>
+
+    <h2>Contact</h2>
+    If you still encounter problem, please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+
+</div>
+
+{% endblock %}

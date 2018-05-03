@@ -1,0 +1,50 @@
+\renewcommand{\TheType}{%(type)s}
+\renewcommand{\TheCat}{%(category)s}
+\setbool{UseGraphic}{%(img_use)s}
+\renewcommand{\TheWidth}{%(img_width)s}
+\renewcommand{\TheCaption}{%(img_caption)s}
+\renewcommand{\TheLabel}{%(label)s}
+\renewcommand{\TheTime}{%(time)s}
+
+
+\setcounter{footnote}{0}
+
+
+%%%% head and foot
+
+\clearscrheadings
+%% \setkomafont{sectioning}{\normalcolor\bfseries}
+%% outer head
+\rohead{\TheCat}
+\lehead{\TheCat}
+
+%% inner foot (abstract label)
+\lofoot{\TheLabel}
+\refoot{\TheLabel}
+
+%% center foot (abstract time)
+\cefoot{\TheTime}
+\cofoot{\TheTime}
+
+%% outer foot (page number)
+\lefoot{\thepage}
+\rofoot{\thepage}
+
+
+\begin{center}
+
+\LARGE
+%(title)s \\
+\small
+\septitle
+%(authoraffil)s
+
+\end{center}
+
+%%%% abstract
+%(abstracttext)s
+
+\thispagestyle{scrheadings}
+
+%%%% optional figure
+\placefigure*

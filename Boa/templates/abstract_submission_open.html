@@ -1,0 +1,283 @@
+{% extends "abstract_submission.html" %}
+
+{% set macros_markdown = [
+    ('bold', '**', '**'),
+    ('italics', '*', '*'),
+    ('Superscript Text', '^', '^'),
+    ('Subscript Text', '~', '~'),
+    ('Footnote', ' ^[', ']'),
+    ('Citation', ' ^[A. Uthor, et.al., Nature (2015), **1**, 1-10]', ''),
+    ]
+%}
+
+{% set macros_latex = [
+    ('ChemFormula', '$\\\\ce{', '}$'),
+    ('$ Math Mode $', '$', '$'),
+    ('Superscript Math', '^', ''),
+    ('Subscript Math', '_', ''),
+    ('&alpha;'|safe, '$\\\\alpha$', ''),
+    ('&beta;'|safe, '$\\\\beta$', ''),
+    ('&gamma;'|safe, '$\\\\gamma$', ''),
+    ('&pi;'|safe, '$\\\\pi$', ''),
+    ('&omega;'|safe, '$\\\\omega$', ''),
+    ]
+%}
+
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery_1.11.3.js') }}">\x3C/script>');
+        var csrftoken = "{{ csrf_token() }}";
+        var institute_presets = {{ institute_presets | tojson }};
+        var default_country_id = "{{ default_country_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='abstract_submission.js') }}"></script>
+{% endblock %}
+
+{% block submission %}
+
+{# set columns and reimport formhelpers with context #}
+{% set col_0 = 'col-sm-3 col-md-2 col-lg-2' %}
+{% set col_1 = 'col-sm-9 col-md-10 col-lg-10' %}
+{% set col_2 = 'col-sm-0 col-md-0 col-lg-0' %}
+{% import  "formhelpers.html" as formhelpers with context %}
+
+<div class="container">
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> It seems you did not enter all data correctly. Please check below.
+        </div>
+    {% endif %}
+
+
+    <div class="well well-important">
+        <p class="text-center h4">
+            <a href="{{ url_for('abstract_submission_login', restricted='') }}">Return to Login</a><br /><br />
+            Abstracts can be formatted with <strong>Markdown</strong> and <strong>LaTeX</strong>. Check the <a href="{{ url_for('help_page') }}">Help page</a> for some examples. Please note, that the buttons require Javascript to be enabled.
+        <p>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <form action="{{ url_for('abstract_submission') }}" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+
+        {{ form.hidden_tag() }}
+        {{ form.btest(class='btest') }}
+
+        <div class="container-fluid">
+
+            {% if not invited %}
+                <div class="row h4">
+                    <div class="form-group">
+                        <div class="col-sm-0 col-md-1 col-lg-1"></div>
+                        <div class="col-sm-5 col-md-4 col-lg-4">
+                            {{ formhelpers.render_radios(form.contribution, col0=7) }}
+                        </div>
+                        <div class="col-sm-7 col-md-7 col-lg-7">
+                            <span class="help-block">Changing your Contribution to "None" will prevent your abstract from appearing in the Book of Abstracts. If you want your abstract deleted, please contact us.</span>
+                        </div>
+                        <div class="col-sm-0 col-md-0 col-lg-1"></div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div id="authaffil" class="row">
+
+                <div id="authors" class="col-sm-6">
+
+                    {% for author in form.authors %}
+                        <div class="well well-sm well-authaffil" id="author_{{ loop.index - 1 }}">
+
+                            {{ formhelpers.wrap_tag('''
+                                <h3>
+                                    <label class="title">%s</label>
+                                    <button type="button" id="rmauth_%i" class="rmauth btn btn-danger btn-sm btn-spaced">Remove</button>
+                                </h3>
+                                ''' %( 'Main Author' if (loop.index==1) else 'Author '+loop.index|string, loop.index-1 ), col0=2 )
+                            }}
+
+                            <br />
+
+                            {{ formhelpers.render_field(author.firstname, col0=4, class='enable_buttons') }}
+                            {{ formhelpers.render_field(author.lastname, col0=4, class='enable_buttons') }}
+                            {{ formhelpers.render_field(author.affiliations, col0=4, help='List the numbers of the corresponding Affiliations, e.g. "1, 3".') }}
+
+                        </div>
+                    {% endfor %}
+
+                    {{ formhelpers.wrap_tag('<button type="button" id="addauth" class="btn btn-success btn-sm">Add Author</button>', col0=2) }}
+                </div>
+
+                <div id="affiliations" class="col-sm-6">
+                    {% for affil in form.affiliations %}
+                        <div class="well well-sm well-authaffil" id="affiliation_{{ loop.index - 1 }}">
+
+                            {{ formhelpers.wrap_tag('''
+                                <h3>
+                                    <label class="title">Affiliation %i</label>
+                                    <button type="button" id="rmaffil_%i" class="rmaffil btn btn-danger btn-sm btn-spaced">Remove</button>
+                                </h3>
+                                ''' %(loop.index,loop.index-1))
+                            }}
+
+                            <br />
+
+                            {% if institute_presets %}
+
+                                {{ formhelpers.render_field( affil.institute, col0=4, class='select_inst') }}
+                                {{ formhelpers.render_field( affil.institute_alt, col0=4, class='enable_buttons', hide_label=1, disabled=not (affil.institute)|attr('data') == 'other') }}
+
+                            {% else %}
+
+                                {{ formhelpers.render_field( affil.institute, col0=4, class='enable_buttons') }}
+
+                            {% endif %}
+
+                            {{ formhelpers.render_field( affil.department, class='enable_buttons', col0=4) }}
+                            {{ formhelpers.render_field( affil.street, class='enable_buttons', col0=4) }}
+                            {{ formhelpers.render_field( affil.postal_code, col0=4) }}
+                            {{ formhelpers.render_field( affil.city, class='enable_buttons', col0=4,) }}
+                            {{ formhelpers.render_field( affil.country, col0=4) }}
+
+                        </div>
+                    {% endfor %}
+
+                    {{ formhelpers.wrap_tag('<button type="button" id="addaffil" class="btn btn-success btn-sm">Add Affiliation</button>', col0=2) }}
+
+                </div>
+
+            </div>
+
+            <br />
+            <button type="submit" class="btn btn-primary" formaction="{{ url_for('abstract_submission', _anchor='authaffil') }}">Save</button>
+
+            <div class="row">
+
+                {{ formhelpers.render_field(form.category, id='category') }}
+                {{ formhelpers.render_field(form.title, class='enable_buttons') }}
+
+                {{ formhelpers.start_wrap(label='Formatting') }}
+                {% for title, macros in [('Markdown', macros_markdown), ('LaTeX', macros_latex)] %}
+                        <div class="row">
+                            <div class="col-sm-1">
+                                <label>{{ title }}</label>
+                            </div>
+                            <div class="col-sm-11">
+                                <div id="latex_buttons_text" class="btn-group">
+                                    {% for name, start, end in macros: %}
+                                        <button type="button" class="latex_button btn btn-primary btn-xs btn-latex" onClick="insert('{{ start }}', '{{ end }}')">{{ name }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+                <span class="help-block">The command will be inserted in the last clicked field. You can also mark some text to directly wrap it in the corresponding command.</span>
+                    <div class="alert alert-danger">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    Abstracts can be formatted with <strong>Markdown</strong> and <strong>LaTeX</strong>. Check the <a href="{{ url_for('help_page') }}">Help page</a> for some examples. Please note, that the buttons require Javascript to be enabled.
+                </div>
+                {{ formhelpers.end_wrap() }}
+
+                {{ formhelpers.render_field(form.content, rows=30, class='enable_buttons') }}
+
+            </div>
+
+            <div class="row">
+
+                <div class="form-group">
+
+                    <label class="control-label {{ col_0 }}">Current Figure</label>
+                    <div class="{{ col_1 }}">
+                        {% if figure_available %}
+                                <div class="row">
+                                    {% if figure_available == 'pdf' %}
+                                        <div class="col-sm-8 col-md-5">
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <embed src="{{ url_for('images', ID=ID) }}" class="embed-responsive-item">
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-sm-8 col-md-5">
+                                            <img src="{{ url_for('images', ID=ID) }}" class="img-responsive" alt="Error displaying picture.">
+                                        </div>
+                                    {% endif %}
+                                <div class="col-sm-4 col-md-7">
+                                    {{ formhelpers.render_checkbox(form.img_use) }}
+                                    {{ formhelpers.render_checkbox(form.img_delete) }}
+                                </div>
+                            </div>
+                        {% else %}
+                            Currently, there is no figure uploaded.
+                        {% endif %}
+                    </div>
+                    <div class="{{ col_2 }}"></div>
+
+                </div>
+
+                {{ formhelpers.render_field(form.img_upload, help='(max. file size: %.1f MiB, allowed file types: %s)' %(MAX_FILE_SIZE, ALLOWED_EXTENSIONS)) }}
+                {{ formhelpers.render_field(form.img_width) }}
+                {{ formhelpers.render_field(form.img_caption, rows=3, class='enable_buttons') }}
+
+                {% if invited %}
+
+                    <div class="form-group">
+
+                        <label class="control-label {{ col_0 }}">Current Portrait</label>
+                        <div class="{{ col_1 }}">
+                            {% if portrait_available %}
+                                    <div class="row">
+                                        {% if portrait_available == 'pdf' %}
+                                            <div class="col-sm-8 col-md-5">
+                                                <div class="embed-responsive embed-responsive-16by9">
+                                                    <embed src="{{ url_for('portraits', ID=ID) }}" class="embed-responsive-item">
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="col-sm-8 col-md-5">
+                                                <img src="{{ url_for('portraits', ID=ID) }}" class="img-responsive" alt="Error displaying picture.">
+                                            </div>
+                                        {% endif %}
+                                </div>
+                            {% else %}
+                                Currently, there is no portrait uploaded.
+                            {% endif %}
+                        </div>
+                        <div class="{{ col_2 }}"></div>
+
+                    </div>
+
+                    {{ formhelpers.render_field(form.portrait_upload, help='(max. file size: %d MB, allowed file types: %s)' %(MAX_FILE_SIZE, ALLOWED_EXTENSIONS)) }}
+
+                {% endif %}
+
+                {{ formhelpers.start_wrap() }}
+                {{ formhelpers.render_checkbox(form.halt_on_error, help='''
+                    If enabled and LaTeX encounters an error, it will stop  at this point and the error message will be displayed for you to check.
+                    <br />
+                    Sometimes the error messages can be a bit cryptic. If you uncheck this option, LaTeX will TRY to resolve the problem on its own. This might lead to unexpected results, like the erroneous part disappearing from the pdf! Correct output is NOT guaranteed!
+                    '''|safe)
+                }}
+                {{ formhelpers.end_wrap() }}
+
+            </div>
+
+            <div class="row">
+
+                {{ formhelpers.start_wrap() }}
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('abstract_submission', _anchor='category') }}">Save</button>
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('create_preview') }}" formmethod="post">Save &amp; Preview</button>
+                    <span class="help-block">(You will be redirected to your preview after the server generated it. This may take a moment.)<span>
+                {{ formhelpers.end_wrap() }}
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

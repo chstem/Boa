@@ -1,0 +1,26 @@
+% typesets the abstract speciefied by \TheID
+% template used by 'make_preview.sh'
+
+
+\input{preamble}
+\renewcommand{\TheID}{_ID_}%%% change this line
+
+\begin{document}
+
+\input{\abstractspath/\TheID/abstract.tex}
+
+%%% edit head and foot
+
+% head
+\rehead{!!! ONLY ONE PAGE !!!}
+% inner foot
+\lofoot{\TheType \sep \textbf{\TheID}}
+\refoot{\textbf{\TheID} \sep \TheType}
+% center foot
+\cofoot{\today\ \now}
+\cefoot{\today\ \now}
+
+\pagestyle{scrheadings}
+
+
+\end{document}

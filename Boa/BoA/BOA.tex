@@ -1,0 +1,207 @@
+% main tex-file for the complete Book of Abstract
+
+\input{preamble}
+% \usepackage{sudoku}
+\usepackage{pdfpages}
+\usepackage{subcaption} % for subfigure environment
+\usepackage{wrapfig}
+\usepackage{cleveref}
+\newcommand{\crefpairconjunction}{, }
+\newcommand{\creflastconjunction}{, }
+\usepackage{qrcode}
+\usepackage{pbox}
+\usepackage{multicol}
+% \setlength{\columnsep}{1cm}
+
+\hypersetup{
+    pdfauthor={},               % author
+    pdfsubject={},              % subject of the document
+    pdfkeywords={} {} {} {} {}, % list of keywords
+%     linktocpage=true,
+}
+
+\newcommand{\printcolor}{color}    % black or color
+\definecolor{gdchgreen}{HTML}{64a70b}
+
+% load Time Table and Names of Talk Authors
+\input{Timetable.tex}
+\input{TalksTOC.tex}
+
+% create counter
+\newcounter{abstractpage}    % required for correct hyperrefs in Index
+\newcounter{talk}
+\newcounter{poster}
+
+% macro to include abstracts
+\newcommand{\includeabstract}[1]{
+    \reinitializeparameters
+    \renewcommand{\TheID}{#1}
+    \refstepcounter{abstractpage}
+    \label{\TheID}
+    \input{abstracts/\TheID/abstract.tex}
+    \newpage
+}
+
+% Section command
+\newcommand{\Qsection}[1]{
+    \cleardoublepage
+    \hspace{0pt}
+    \vfill
+    \begin{center}
+        \ifdefstring{\printcolor}{color}{
+            \Huge \color{gdchgreen}\textbf{#1}
+        }{
+            \Huge \textbf{#1}
+        }
+    \end{center}
+    \vfill
+    \phantomsection
+    \thispagestyle{empty}
+    \addcontentsline{toc}{section}{#1}
+    \clearpage
+    }
+
+% Section command
+\newcommand{\Qsubsection}[1]{
+    \cleardoublepage
+    \hspace{0pt}
+    \vfill
+    \begin{center}
+        \ifdefstring{\printcolor}{color}{
+            \Huge \color{gdchgreen}\textbf{#1}
+        }{
+            \Huge \textbf{#1}
+        }
+    \end{center}
+    \vfill
+    \phantomsection
+    \thispagestyle{empty}
+    \addcontentsline{toc}{subsection}{#1}
+    \clearpage
+    }
+
+\setcounter{secnumdepth}{0}         % no numbering of sections
+\addtokomafont{section}{\Huge}      % increase size of headlines
+
+\begin{document}
+
+%% Cover + Sponsors
+
+\includepdf{pictures/Cover_Front}
+\includepdf{pictures/Sponsoren}
+
+%% Impressum
+\cleardoublepage
+\setcounter{page}{1}
+\leftwatermark{\ClearWallPaper}
+\rightwatermark{\ClearWallPaper}
+
+\ \vfill
+% Coloured version is available online:\\
+% \par
+% \ \hspace{2cm}\qrcode[hyperlink,height=2.5cm,padding]{<URL>}\\
+% \par
+% \ \hspace{2cm}\url{<URL>}\\
+
+\vspace{2em}
+\textbf{Impressum}\\
+\ \\
+Copyright \copyright\ \emph{\the\year} xxx\\
+\ \\
+\url{<your webseite}
+
+
+%% Table of Contents
+\cleardoublepage
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Content_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Content_right_\printcolor}}
+% \large
+\pdfbookmark[1]{\contentsname}{toc}
+\setcounter{tocdepth}{5}
+\tableofcontents
+\normalsize
+\newpage
+
+%% Greetings
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{Greetings}
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Greetings_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Greetings_right_\printcolor}}
+\include{Greetings}
+
+%% Program
+\clearpage
+\section{Program}
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Program_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Program_right_\printcolor}}
+\input{Program}
+
+%% Abstract for Plenary Lecture
+\clearpage
+\clearscrheadings
+% outer foot
+\lefoot{\thepage}
+\rofoot{\thepage}
+
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Talks_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Talks_right_\printcolor}}
+\phantomsection
+\Qsection{Plenary Lecture}
+\thispagestyle{scrheadings}
+\includeabstract{<pleanry_ID>}
+
+%% Talks
+\cleardoublepage
+\Qsection{Talks}
+\input{Talks}
+
+%% Poster
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Poster_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Poster_right_\printcolor}}
+\Qsection{Posters}
+\input{Posters}
+
+\cleardoublepage
+
+% outer foot
+\lefoot{\thepage}
+\rofoot{\thepage}
+
+\selectlanguage{english}
+
+%% Author and Participant Index
+\cleardoublepage
+\pagestyle{plain}
+\phantomsection
+\leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Index_left_\printcolor}}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Index_right_\printcolor}}
+\Qsection{Index}
+\clearpage
+\begin{multicols}{2}
+    \input{Index}
+\end{multicols}
+
+%% Additional Stuff
+% \newpage
+% \leftwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Notes_left_\printcolor}}
+% \rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{thumbregisters/Notes_right_\printcolor}}
+
+%% Notes
+\clearpage
+\Qsection{Notes}
+\clearpage
+\mbox{}
+\clearpage
+\mbox{}
+\cleardoublepage
+
+%% Back
+\leftwatermark{\ClearWallPaper}
+\rightwatermark{\ClearWallPaper}
+\rightwatermark{\ClearWallPaper\TileWallPaper{\paperwidth}{\paperheight}{pictures/Cover_Back}}
+\cleardoubleevenemptypage
+\cleardoublepage
+\thispagestyle{empty}
+
+\end{document}

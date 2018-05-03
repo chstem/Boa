@@ -1,0 +1,146 @@
+[
+    {
+        "type" : "category",
+        "label" : "Event"
+        },
+    {
+        "key" : "reference",
+        "type" : "multi",
+        "label" : "How did you learn about the event?",
+        "choices" : [
+            {
+                "key" : "internet",
+                "label" : "Internet & Social Media"
+                },
+            {
+                "key" : "poster",
+                "label" : "Poster and Flyers"
+                },
+            {
+                "key" : "friends",
+                "label" : "Friends, Fellow Students, Colleages, etc."
+                },
+            {
+                "key" : "email",
+                "label" : "E-Mail/Mailing List"
+                }
+            ],
+        "inline" : false,
+        "required" : false,
+        "other" : true
+        },
+    {
+        "type" : "category",
+        "label" : "Grading",
+        "help" : "1 (very good), 2 (good), 3 (satisfactory), 4 (insufficient)"
+        },
+    {
+        "key" : "grade_program",
+        "type" : "radio_int",
+        "label" : "Program & Timetable",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_moderation",
+        "type" : "radio_int",
+        "label" : "Moderation",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_talks",
+        "type" : "radio_int",
+        "label" : "Talk Sessions",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_poster",
+        "type" : "radio_int",
+        "label" : "Poster Session",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_exchange",
+        "type" : "radio_int",
+        "label" : "Opportunity for (scientific) Exchange",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : false
+        },
+    {
+        "key" : "grade_catering",
+        "type" : "radio_int",
+        "label" : "Catering",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_venue",
+        "type" : "radio_int",
+        "label" : "Venue",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_website",
+        "type" : "radio_int",
+        "label" : "Website & Information",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "key" : "grade_submission",
+        "type" : "radio_int",
+        "label" : "Online Abstract Submission",
+        "help" : "Leave empty, if you didn't use it.",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : false
+        },
+    {
+        "key" : "grade_overall",
+        "type" : "radio_int",
+        "label" : "Overall Grade",
+        "choices" : [1, 2, 3, 4],
+        "inline" : true,
+        "required" : true
+        },
+    {
+        "type" : "category",
+        "label" : "Free Comments"
+        },
+    {
+        "key" : "liked",
+        "type" : "text_area",
+        "label" : "Is there anything you liked in particular?",
+        "required" : false
+        },
+    {
+        "key" : "improve",
+        "type" : "text_area",
+        "label" : "In your opinion, is there anything that should be improved?",
+        "required" : false
+        },
+    {
+        "key" : "submission",
+        "type" : "text_area",
+        "label" : "Did you have any technical issues with the website or abstract submission?",
+        "required" : false
+        },
+    {
+        "key" : "comment",
+        "type" : "text_area",
+        "label" : "Do you have any further comments?",
+        "required" : false
+        }
+    ]

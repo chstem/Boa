@@ -1,0 +1,21 @@
+{% extends "abstract_submission.html" %}
+
+{% block submission %}
+
+<div class="container">
+    <div class="jumbotron">
+        {% if reason == 'deadline' %}
+            <p class="text-center">Sorry, the Abstract Submission is already closed!<p>
+        {% elif reason == 'deadline_poster' %}
+            <p class="text-center">Sorry, the Abstract Submission for Poster is already closed!<p>
+        {% elif reason == 'deadline_talks' %}
+            <p class="text-center">Sorry, the Abstract Submission for Talks is already closed!<p>
+        {% elif reason == 'notyet' %}
+            <p class="text-center">The Abstract Submission will be opened on {{ start_submission }} !<p>
+        {% else %}
+            <p class="text-center">The Abstract Submission is closed!<p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

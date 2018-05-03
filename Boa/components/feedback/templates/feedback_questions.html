@@ -1,0 +1,86 @@
+{% extends "feedback_surveys.html" %}
+
+{% block survey %}
+
+<center>
+    <h1 class=".text-centered">{{ conference_name }} {{ year }}</h1>
+</center>
+
+<div class="container">
+
+    {% if submitted %}
+
+        <div class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> Thank you very much for your feedback!
+        </div>
+
+    {% else %}
+
+        <form action="{{ url_for('feedback.feedback', survey=survey) }}" method="post" class="form-horizontal" role="form">
+
+            {{ form.hidden_tag() }}
+            {{ form.btest(class='btest') }}
+
+            {% for question in questions %}
+
+                {% if question['type'] in ('category', 'head') %}
+
+                    <br />
+                    <p class="cat">{{ question['label'] }}</p>
+                    {% if question['help'] %}
+                        <small>({{ question['help'] }})</small>
+                    {% endif %}
+                    <hr>
+
+                {% elif question['type'].startswith('radio') %}
+
+                    {{ formhelpers.render_radios(
+                        form|attr(question['key']),
+                        help=question['help'],
+                        col0=3,
+                        inline=question['inline'],
+                        padding_right=20,
+                        ) }}
+
+                {% elif question['type'] == 'multi' %}
+
+                    {% if question['other'] %}
+
+                        {{ formhelpers.render_multicheckbox(
+                            form|attr(question['key']),
+                            col0=3,
+                            inline=question['inline']
+                            ) }}
+                        {{ formhelpers.render_field(form|attr(question['key']+'_other'), help=question['help'], col0=3) }}
+
+                    {% else %}
+
+                        {{ formhelpers.render_multicheckbox(form|attr(question['key']), help=question['help'], col0=3, inline=question['inline']) }}
+
+                    {% endif %}
+
+                {% else %}
+
+                    {{ formhelpers.render_field(form|attr(question['key']), help=question['help'], col0=3) }}
+
+                {% endif %}
+
+            {% endfor %}
+
+            <center>
+                <button type="submit" class="btn btn-success">Submit</button>
+                {% for s in surveys %}
+                    {% if s != survey %}
+                        <button type="submit" class="btn btn-success" formaction="{{ url_for('feedback.feedback', survey=survey, cont=s) }}">Submit &amp; Continue to {{ s }}</button>
+                    {% endif %}
+                {% endfor %}
+            </center>
+        </form>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

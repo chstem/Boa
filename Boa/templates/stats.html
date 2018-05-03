@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-0 col-md-1 col-lg-1"></div>
+        <div class="col-sm-6 col-md-5 col-lg-4">
+            <h4 class="text-center">Registrations</h4>
+            <table class="table table-bordered table-striped table-responsive text-center">
+                <tr>
+                    <th class="text-center">Participants (total)</th>
+                    <td class="text-center">{{ participants_total }}</td>
+                </tr>
+                {% for event, count in events.items() %}
+                    <tr>
+                        <th class="text-center">Event: {{ event }}</th>
+                        <td class="text-center">{{ count }}</td>
+                    </tr>
+                {% endfor %}
+                {% for rank, count in ranks.items() %}
+                    <tr>
+                        <th class="text-center">Rank: {{ rank }}</th>
+                        <td class="text-center">{{ count }}</td>
+                    </tr>
+                {% endfor %}
+                {% for con, count in contributions.items() %}
+                    <tr>
+                        <th class="text-center">Contribution: {{ con }}  (submitted/total)</th>
+                        <td class="text-center">{{ contributions_submitted[con] }}/{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-sm-0 col-md-1 col-lg-2"></div>
+        <div class="col-sm-6 col-md-4 col-lg-4">
+            <h4 class="text-center">Website Access</h4>
+            <table class="table table-bordered table-striped table-responsive text-center">
+                <tr>
+                    <th class="text-center">Date</th>
+                    <th class="text-center"># unique IPs</th>
+                </tr>
+
+                {% for date, count in IPstats %}
+                    <tr>
+                        <td>{{ date }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "registration.html" %}
+{% set test_mode = False %}
+
+{% block head %}
+    <script>
+        var institute_presets = {{ institute_presets | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='registration.js') }}"></script>
+{% endblock %}
+
+
+{% block registration_form %}
+
+{# set columns and reimport formhelpers with context #}
+{% set col_0 = 'col-sm-3 col-md-2 col-lg-3' %}
+{% set col_1 = 'col-sm-9 col-md-8 col-lg-7' %}
+{% set col_2 = 'col-sm-0 col-md-2 col-lg-2' %}
+{% import  "formhelpers.html" as formhelpers with context %}
+
+<div class="container">
+
+    {% if test_mode %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Test Mode!</strong> This Website is currently under testing. The official registration is not open yet!
+        </div>
+    {% endif %}
+
+    {% if reject_email %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Email already registered!</strong> Please do not register twice! If you accidentally entered some wrong data, just send as an email and we will correct it for you.
+        </div>
+    {% endif %}
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> Some fields contain invalid data. Please check below.
+        </div>
+    {% endif %}
+
+    {% if onsite %}
+        <form action="{{ url_for('register', rank='onsite') }}" method="post" class="form-horizontal" role="form">
+    {% elif rank == 'participant' %}
+        <form action="{{ url_for('register') }}" method="post" class="form-horizontal" role="form">
+    {% else %}
+        <form action="{{ url_for('register', rank=rank) }}" method="post" class="form-horizontal" role="form">
+    {% endif %}
+
+    {{ form.hidden_tag() }}
+    {{ form.btest(class='btest') }}
+
+    <div class="row">
+        {{ formhelpers.start_wrap() }}
+            <h3>Personal Information</h3>
+        {{ formhelpers.end_wrap() }}
+
+        {{ formhelpers.render_field(form.title, class='select_title') }}
+        {{ formhelpers.render_field(form.title_alt, hide_label=1, disabled=1) }}
+        {% if form.gender.choices|length > 1 %}
+            {{ formhelpers.render_field(form.gender) }}
+        {% endif %}
+        {{ formhelpers.render_field(form.firstname) }}
+        {{ formhelpers.render_field(form.lastname) }}
+        {{ formhelpers.render_field(form.email) }}
+
+        {% if address %}
+
+            {{ formhelpers.start_wrap() }}
+                <p class="text-justify">Please note that, in case you present a talk or poster your email will be provided as contact information in the Book of Abstracts.</p>
+                <div class="alert alert-danger">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Important!</strong> You will receive further information (abstract submission, etc.) via email. Please check your email address for correctness!
+                </div>
+            {{ formhelpers.end_wrap() }}
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {{ formhelpers.start_wrap() }}
+            <h3>Institute</h3>
+        {{ formhelpers.end_wrap() }}
+
+        {% if institute_presets %}
+            {{ formhelpers.render_field(form.institute, class='select_inst') }}
+            {{ formhelpers.render_field(form.institute_alt, hide_label=1, disabled=1) }}
+        {% else %}
+            {{ formhelpers.render_field(form.institute) }}
+        {% endif %}
+
+        {{ formhelpers.render_field(form.department) }}
+    </div>
+
+    <div class="row">
+        {{ formhelpers.start_wrap() }}
+            <h3>Invoice Address</h3>
+        {{ formhelpers.end_wrap() }}
+
+        {% if address %}
+            {{ formhelpers.render_field(form.address_line1) }}
+            {{ formhelpers.render_field(form.address_line2) }}
+            {{ formhelpers.render_field(form.street) }}
+            {{ formhelpers.render_field(form.postal_code) }}
+            {{ formhelpers.render_field(form.city) }}
+        {% endif %}
+
+        {{ formhelpers.render_field(form.country) }}
+
+        {% if address %}
+            {{ formhelpers.render_field(form.tax_number) }}
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {{ formhelpers.start_wrap() }}
+            {% if address %}
+                <h3>Event Options and Terms</h3>
+            {% else %}
+                <h3>Event Options</h3>
+            {% endif %}
+        {{ formhelpers.end_wrap() }}
+
+        {{ formhelpers.start_wrap() }}
+        {% if events %}
+            <div class="row col-sm-6">
+            {{ formhelpers.start_wrap(label='Event Participation', col0=6) }}
+            {% for event in events %}
+                {{ formhelpers.render_checkbox(form|attr('events_'+event), col0=6) }}
+            {% endfor %}
+            {{ formhelpers.end_wrap() }}
+            </div>
+        {% endif %}
+
+        {% if address %}
+            <div class="row col-sm-6">
+                {{ formhelpers.render_radios(form.contribution, col0=6) }}
+            </div>
+        {% endif %}
+        {{ formhelpers.end_wrap() }}
+
+        <br />
+
+        {% if address %}
+            {{ formhelpers.wrap_tag('''
+                <p class="text-justify">Talk contributions will be selected by the organizing committee, shortly after the abstract submission is closed. Not accepted talks, may be presented  as a poster instead. You can change your type of contribution at any time before the submission deadline via the <a href="' + url_for('abstract_submission') + '">abstract submission</a>.</p>
+                ''')
+            }}
+
+            <div class="row">
+                <div class="{{ col_0 }}"></div>
+                <div class="{{ col_1 }}">
+                    {{ formhelpers.render_checkbox(form.accept_rules, text='"I have read the <a href="'+url_for('static', filename='terms_and_conditions.pdf')+'" target="_blank">Terms and Conditions</a> of participation and I accept these terms."') }}
+                </div>
+                <div class="{{ col_2 }}"></div>
+            </div>
+            <br />
+        {% endif %}
+    </div>
+
+    {{ formhelpers.wrap_tag('''
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="reset" class="btn btn-primary">Reset</button>
+        ''')
+    }}
+
+    <br />
+
+</form>
+</div>
+
+{% endblock %}

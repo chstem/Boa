@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">
+    <h2 class="text-center">CV-Check (ChiP)</h2>
+</div>
+
+<div class="container">
+
+    <p class="text-justify">
+        In Kooperation mit dem Hochschulteam der Agentur für Arbeit bieten wir einen Bewerbungsmappencheck. Ihr habt hier die Möglichkeit, eure Bewerbungsunterlagen hochzuladen, damit die Experten der Agentur für Arbeit etwas Zeit haben, sie zu überprüfen. Es ist auch möglich, die Bewerbungsunterlagen direkt zur ChiP mitzubringen mitzubringen und sie dort während der Veranstaltung überprüfen zu lassen.
+    </p>
+    <p class="text-justify">
+        Für den Upload benötigt ihr eure ID, die ihr bei der Registrierung bekommen habt. Pro ID wird nur eine Datei gespeichert, ein erneuter Upload überschreibt die vorherige Version.
+    </p>
+
+    {% if form.ID.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> Invalid ID.
+        </div>
+    {% endif %}
+    {% if 'File type is not valid.' in form.upload.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> File type is not valid.
+        </div>
+    {% endif %}
+    {% if success %}
+        <div class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Succes!</strong> Your CV has been uploaded succesfully.
+        </div>
+    {% endif %}
+
+</div>
+
+{% if deadline == 'past' %}
+    <div class="container">
+        <h3 class="text-justify">
+            Die Frist für den CV Upload ist leider bereits abgelaufen. Ihr könnte eure Bewerbungsunterlagen aber trotzdem direkt zu ChiP mitbringen.
+        </h3>
+    </div>
+
+{% else %}
+
+    {% if deadline %}
+        <h3 class="text-center">Deadline: {{ deadline }}</h2>
+    {% endif %}
+
+    <form action="{{ url_for('cv_upload.cv_upload') }}" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+
+        {{ form.hidden_tag() }}
+        {{ form.btest(class='btest') }}
+
+        <div class="row">
+            <div class="col-sm-3 col-md-3 col-lg-3"></div>
+            <div class="col-sm-6 col-md-6 col-lg-6">
+                {{ formhelpers.render_field(form.ID, wrapped=False, autofocus=True) }}
+                {{ formhelpers.render_field(form.upload, wrapped=False, help='Erlaubte Dateitypen: '+allowed_files) }}
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2"></div>
+        </div>
+
+    </form>
+
+    <div class="container">
+        <p>No ID? Please <a href="{{ url_for('register') }}">register</a> first.</p>
+    </div>
+
+{% endif %}
+
+{% endblock %}

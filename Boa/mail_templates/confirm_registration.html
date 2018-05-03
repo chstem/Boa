@@ -1,0 +1,62 @@
+<html>
+<body>
+
+<p>Dear {{ participant.firstname }} {{ participant.lastname }},</p>
+<p>you successfully registered for {{ conference_name }} {{ year }}.</p>
+<br/>
+<p>Your personal ID is: {{ participant.ID }}</p>
+<br/>
+<p>
+In case you want to present a poster or talk, you will need to submit an abstract. For this you need your ID as a login.
+The abstract can be formatted with Markdown and LaTeX. If you need help with this, please first have a look at the <a href="{{ url_for('help_page', _external=True) }}">help page</a>.
+If you have problems with your abstract submission you may contact us via our support mail (<a href="mailto:{{ support_email }}">{{ support_email }}</a>).
+</p>
+<p>
+You can submit your abstract using our online <a href="{{ url_for('abstract_submission', _external=True) }}">submission form</a>.<p/>
+
+<br/>
+{% if deadline_talks %}
+    <p>Please note, the submission deadlines for poster ({{ deadline_poster }}) and talks ({{ deadline_talks }}).</p>
+{% else %}
+    <p>Please note, that the submission deadline ends {{ deadline_poster }}.</p>
+{% endif %}
+<br/>
+
+{% if participant.rank == 'participant' %}
+    <p>Please transfer the registration fee
+    {% if fee %}
+        ({{ fee }} &euro;)
+    {% endif %}
+    to the bank account below till {{ deadline_payment }}!
+    <br/>
+    Account holder: {{ account.holder }}<br />
+    Reference/Verwendungszweck: {{ account.reference.replace('[ID]', ID) }}<br />
+    Bank: {{ account.bank }}<br />
+    SWIFT-BIC: {{ account.SWIFT }}<br />
+    IBAN: {{ account.IBAN }}<br />
+    <br/>
+{% endif %}
+
+Here is your submitted data:<br/>
+<br/>
+Titel / Name: {{ ' '.join((participant.title, participant.firstname, participant.lastname)) }}<br/>
+{% if participant.gender %}
+Gender: {{  participant.gender }}<br/>
+{% endif %}
+Email: {{ participant.email }}<br/>
+Institut: {{ participant.institute }}; {{ participant.department }} <br/>
+Invoice Adress: {{ participant.address_line1 }}; {{ participant.address_line2 }}; {{ participant.street }}<br/>
+{% if participant.tax_number %}
+Tax Number: {{ participant.tax_number }}<br/>
+{% endif %}
+City: {{ ' '.join((participant.postal_code, participant.city)) }}<br/>
+Country: {{ participant.country }}<br/>
+Contribution: {{ participant.contribution }}<br/>
+Events: {{ participant.events.replace(',', ', ') }}<br/>
+ID: {{ participant.ID }}<br/>
+<br/>
+<p>Sincerely,</p>
+<p>the Organizers</p>
+
+</body>
+</html>

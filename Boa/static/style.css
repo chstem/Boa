@@ -1,0 +1,105 @@
+/* hide input */
+input.btest {
+    display: none;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+/** set some custom colors for buttons **/
+.well-important {
+    background-color: #f0a8a8;
+}
+
+.well-authaffil {
+    background-color: #d4f7dd;
+}
+
+.btn-spaced {
+    margin-left: 10px;
+}
+
+.btn-latex {
+    background-color: #6ca7ff;
+}
+
+/* make button size depending on screen size */
+/* LG Rules */
+@media (min-width: 1200px) {
+    .btn.btn-mq {
+        padding: 10px 16px;
+        font-size: 18px;
+        line-height: 1.3333333;
+        border-radius: 6px;
+    }
+}
+
+/* MD Rules */
+@media (max-width: 1199px) {
+    .btn.btn-mq {
+        padding: 7px 12px;
+        font-size: 16px;
+        line-height: 2;
+        border-radius: 4px;
+  }
+}
+
+/* SM Rules */
+@media (max-width: 991px) {
+    .btn.btn-mq {
+        padding: 7px 12px;
+        font-size: 14px;
+        line-height: 2;
+        border-radius: 4px;
+  }
+}
+
+/** Sponsor Logos **/
+.img-center {
+/*     display: table-cell; */
+    text-align: center;
+/*     vertical-align: center; */
+}
+
+.logo-head {
+    max-height:50px;
+    max-width:200px;
+    display:inline-block;
+}
+
+.logo-height {
+    max-height:100px;
+}
+
+@media (max-width: 991px) {
+    .logo-head {
+    max-height:40px;
+    display:inline-block;
+    }
+}
+
+@media (max-width: 767px) {
+    .logo-height {
+        max-height:70px;
+    }
+    .logo-head {
+    max-height:30px;
+    display:inline-block;
+    }
+}
+
+.vertical-align {
+    display: display;
+    align-items: center;
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .vertical-align {
+        display: flex;
+        align-items: center;
+    }
+}

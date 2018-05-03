@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+{{ formhelpers.include_csrf_form() }}
+
+<div class="container">
+
+    <h1 class="text-center">Abstract Submission - Preview</h1>
+
+    {% if (not tex_log) or (not halt_latex) %}
+        <div class="well">
+            {% if (Npages and (Npages > 1)) or tex_log %}
+                <h3><font color="red">Your abstract has been uploaded, but there were some problems. Please check below.</font></h3>
+            {% else %}
+                <h3><font color="green">Your abstract has been uploaded successfully.</font></h3>
+                <p>(No, you do NOT need to send it to us. If you see this we already have everything we need!)</p>
+            {% endif %}
+            <p> You can see a preview of your abstract below. If your browser does not support the pdf plugin, you can download your preview here: <a href="{{ url_for('preview', ID=ID) }}">Download Preview</a>.</p>
+        </div>
+    {% endif %}
+
+    {% if Npages and (Npages > 1) %}
+        <div class="alert alert-danger">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Warning!</strong> Your abstracts is longer than 1 page. Please make it fit on a single page.
+        </div>
+    {% endif %}
+
+    {% if delims %}
+
+        {% if delims['braces'] > 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced curly braces <code>&#123;&#125;</code> detected. You have {{ delims['braces'] }} unclosed <code>&#123;</code>. This may result in LaTeX errors.
+            </div>
+        {% elif delims['braces'] < 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced curly braces <code>&#123;&#125;</code> detected. You have {{ -delims['braces'] }} unopened <code>&#125;</code>. This may result in LaTeX errors.
+            </div>
+        {% endif %}
+
+        {% if delims['brackets'] > 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced brackets <code>[]</code> detected. You have {{ delims['brackets'] }} unclosed <code>[</code>. This may result in LaTeX errors.
+            </div>
+        {% elif delims['brackets'] < 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced brackets <code>[]</code> detected. You have {{ -delims['brackets'] }} unopened <code>]</code>. This may result in LaTeX errors.
+            </div>
+        {% endif %}
+
+        {% if delims['parenthesis'] > 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced parenthesis <code>()</code> detected. You have {{ delims['parenthesis'] }} unclosed <code>(</code>. This may result in LaTeX errors.
+            </div>
+        {% elif delims['parenthesis'] < 0 %}
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Warning!</strong> Unbalanced parenthesis <code>()</code> detected. You have {{ -delims['parenthesis'] }} unopened <code>)</code>. This may result in LaTeX errors.
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+    {% if tex_log %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> LaTeX encountered one or more problems. I hope, this error message will help you:
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" id="log" name="log" rows="10">{{ tex_log }}</textarea>
+        </div>
+    {% else %}
+        <div class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> LaTeX did not encounter any problems.
+        </div>
+    {% endif %}
+
+    {% if (not tex_log) or (not halt_latex) %}
+        <div class="embed-responsive embed-responsive-4by3">
+            <embed src="{{ url_for('preview', ID=ID) }}" class="embed-responsive-item">
+        </div>
+    {% endif %}
+
+
+    {% if tex_log %}
+
+        <div class="well">
+            <p>If the above error message is not of much help, you can try the following:</p>
+            <ul>
+                <li>Check whether all opened curly braces <code>&#123;</code> are properly closed by <code>&#125;</code>.</li>
+                <li>Math mode commands (including greek letters) need to start and end with a dollar sign <code>&#36;</code>.</li>
+                <li>Unchecking "Stop LaTeX on Error" will cause LaTeX to ignore all errors and continue creating the preview. Sometimes this will fix the issue. However, there is a chance that LaTeX will just skip erroneous part, thus it will NOT appear in your preview pdf. As correct output cannot be guaranteed, this option is not recommended.</li>
+                <li>Check the <a href="{{ url_for('help_page') }}">Help page</a> for some examples and the FAQ section. You may also contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</li>
+            </ul>
+        </div>
+
+    {% endif %}
+
+    <br />
+    {% if (not tex_log) or (not halt_latex) %}
+        <a href="{{ url_for('preview', ID=ID) }}" class="btn btn-primary">Download Preview</a>
+    {% endif %}
+    <a href="{{ url_for('abstract_submission', _anchor='category') }}" class="btn btn-primary">Return to Submission</a>
+
+</div>
+
+{% endblock %}

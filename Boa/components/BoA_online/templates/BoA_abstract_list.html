@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<!-- load MathJax from CDN with enabled mhchem-->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    },
+    TeX: {
+      extensions: ["mhchem.js"]
+    }
+  });
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <h2>List of Abstracts</h2>
+
+    <h3>Contributed Talks</h3>
+    <ul>
+    {% for t in talks %}
+        <li><a href="{{ url_for('BoAonline.abstract', ID=t.label) }}">{{ t.label }} </a> {{ t.participant.fullname }}: {{ t.title|markdown|safe }}</li>
+    {% endfor %}
+    </ul>
+
+    <h3>Poster</h3>
+    <ul>
+    {% for p in poster %}
+        <li><a href="{{ url_for('BoAonline.abstract', ID=p.label) }}">{{ p.label }} </a> {{ p.participant.fullname }}: {{ p.title|markdown|safe }}</li>
+    {% endfor %}
+    </ul>
+
+</div>
+
+{% endblock %}

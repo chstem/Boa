@@ -1,0 +1,24 @@
+{% extends "abstract_submission.html" %}
+
+{% block submission %}
+
+<div class="container">
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> There are some incomplete information. Please resolve the following issues:
+        </div>
+    {% endif %}
+
+    <ul>
+    {% for problem in problems %}
+        <li> {{ problem }} </li>
+    {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('abstract_submission') }}" class="btn btn-primary">Return to Submission</a>
+
+</div>
+
+{% endblock %}

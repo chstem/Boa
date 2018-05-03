@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<!-- load MathJax from CDN with enabled mhchem-->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    },
+    TeX: {
+      extensions: ["mhchem.js"]
+    }
+  });
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <span>{{ time_slot }}</span>
+    <span style="text-align:right; float:right;">{{ category }}</span>
+    <h2 class="text-center">{{ title|safe }}</h2>
+    {{ authaffil|safe }}
+    <div class="text-justify">{{ content|safe }}</div>
+    {% if img_use %}
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-0"></div>
+        <div class="col-lg-8 col-md-8 col-sm-12">
+            <figure>
+                <img src="{{ url_for('images_web', ID=ID) }}" class="img-responsive" alt="- Error displaying picture. -">
+                <div class="caption">
+                    <p>{{ img_caption|safe }}</p>
+                </div>
+            </figure>
+        </div>
+    </div>
+    {% endif %}
+    {{ footnotes|safe }}
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<style>
+.cat {
+    display: inline;
+    font-size: 1.5em;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+/*     font-weight: bold; */
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <center>
+        <h1 class=".text-centered">Feedback Survey</h1>
+    </center>
+
+    <div class="container centered">
+
+        <b>Please choose the event:</b>
+        {% for s in surveys %}
+            <a href="{{ url_for('feedback.feedback', survey=s) }}" class="btn btn-success" role="button">{{ s }}</a>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% block survey %}{% endblock %}
+
+{% endblock %}

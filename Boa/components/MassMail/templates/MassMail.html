@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<center>
+    <h1>{{ conference_acronym+' '+year }} - Send Mass Mails</h1>
+</center>
+
+<div class="container">
+
+    {% if sent is not none %}
+        <div class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> Number of Emails sent: {{ sent }}
+        </div>
+    {% endif %}
+
+</div>
+
+<div class="container">
+    <form action="{{ url_for('MassMail.MassMail') }}" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+
+        {{ form.hidden_tag() }}
+        {{ form.btest(class='btest') }}
+
+        <div class="container">
+
+            <div class="row">
+
+                {{ formhelpers.render_field(form.subject) }}
+                {{ formhelpers.render_field(form.mail_body, rows=30) }}
+
+                <div class="well well-sm">
+                    {{ formhelpers.start_wrap(label='Options') }}
+                        {{ formhelpers.render_checkbox(form.HTML, help='HTML format ignores line breaks! Use the appropriate HTML tags (<p></p>, <br>) instead!') }}
+                        {{ formhelpers.render_checkbox(form.template, help='e.g. "{{participant.firstname}}" or "{{conference_name}}"; recipient is a synonym for participant') }}
+                    {{ formhelpers.end_wrap() }}
+                </div>
+
+                <div class="well well-sm">
+                    {{ formhelpers.start_wrap(label='Drafts') }}
+                        <div class="row">
+                            {{ formhelpers.render_field(form.filename, groupclass='col-sm-10', col0=3) }}
+                            <button type="submit" class="btn btn-primary col-sm-2" formaction="{{ url_for('MassMail.MassMail', action='store_draft') }}">Store Draft</button>
+                        </div>
+                        <div class="row">
+                            {{ formhelpers.render_field(form.drafts, groupclass='col-sm-10', col0=3) }}
+                            <button type="submit" class="btn btn-primary col-sm-2" formaction="{{ url_for('MassMail.MassMail', action='load_draft') }}">Load Draft</button>
+                        </div>
+                    {{ formhelpers.end_wrap() }}
+                </div>
+
+                <div class="well well-sm">
+                    {{ formhelpers.start_wrap(label='Attachments') }}
+                        <div class="row">
+                            {{ formhelpers.render_field(form.fileupload, groupclass='col-sm-10', col0=3, help='(max. file size: %.1f MiB, allowed file types: %s)' %(MAX_FILE_SIZE, ALLOWED_EXTENSIONS)) }}
+                            <button type="submit" class="btn btn-primary col-sm-2" formaction="{{ url_for('MassMail.MassMail', action='upload') }}">Upload File</button>
+                        </div>
+                    {{ formhelpers.end_wrap() }}
+                    {{ formhelpers.render_multicheckbox(form.attachments) }}
+                </div>
+
+                <div class="well well-sm">
+                    <b>Select Recipients</b>
+                    {{ formhelpers.start_wrap() }}
+                        {{ formhelpers.render_checkbox(form.recipients_all) }}
+                    {{ formhelpers.end_wrap() }}
+
+                    {{ formhelpers.render_radios(form.conjunction, class='recipient', inline=False) }}
+
+                    {{ formhelpers.start_wrap(label='Ranks') }}
+                        {{ formhelpers.render_checkbox(form.ranks_enable, class='recipient') }}
+                        {% for rank in ranks %}
+                            {{ formhelpers.render_checkbox(form|attr('ranks_'+rank), class='recipient rank') }}
+                        {% endfor %}
+                    {{ formhelpers.end_wrap() }}
+
+                    {% if events %}
+                    {{ formhelpers.start_wrap(label='Events') }}
+                        {{ formhelpers.render_checkbox(form.events_enable, class='recipient') }}
+                        {% for event in events %}
+                            {{ formhelpers.render_checkbox(form|attr('events_'+event), class='recipient event') }}
+                        {% endfor %}
+                    {{ formhelpers.end_wrap() }}
+                    {% endif %}
+
+                    {{ formhelpers.start_wrap(label='Contributions') }}
+                        {{ formhelpers.render_checkbox(form.contributions_enable, class='recipient') }}
+                        {% for con in contributions %}
+                            {{ formhelpers.render_checkbox(form|attr('contributions_'+con), class='recipient contribution') }}
+                        {% endfor %}
+                        {{ formhelpers.render_checkbox(form.abstract_missing, class='recipient contribution') }}
+                    {{ formhelpers.end_wrap() }}
+
+                    {% if activities %}
+                        {{ formhelpers.start_wrap(label='Activities') }}
+                        {% for group in activities %}
+                            {{ formhelpers.render_checkbox(form|attr('act_'+group['key']), class='recipient') }}
+                            {{ formhelpers.start_wrap(col0=1) }}
+                            {% for event in group['events'] %}
+                                {{ formhelpers.render_checkbox(form|attr('act_'+group['key']+'_'+event['key']), class='recipient '+group['key']) }}
+                            {% endfor %}
+                            {{ formhelpers.end_wrap() }}
+                        {% endfor %}
+                        {{ formhelpers.end_wrap() }}
+                    {% endif %}
+
+                    {{ formhelpers.render_field(form.paid, class='recipient') }}
+                    {{ formhelpers.render_field(form.bcc_filter, help='Attention: A copy will be send for every email filtered. This may be a lot of emails!') }}
+
+
+                    {{ formhelpers.start_wrap() }}
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('MassMail.MassMail', action='send_filter') }}">Send to Selection</button>
+                    {{ formhelpers.end_wrap() }}
+
+                </div>
+
+                <div class="well well-sm">
+                    <b>Send to List</b> (e.g. for testing; no template rendering if mail address is not available in database!)<br />
+                    <br />
+                    {{ formhelpers.render_field(form.recipients_list) }}
+                    {{ formhelpers.render_field(form.bcc_list, help='Attention: A copy will be send for every email in the list. This may be a lot of emails!') }}
+
+                    {{ formhelpers.start_wrap() }}
+                        <button type="submit" class="btn btn-primary" formaction="{{ url_for('MassMail.MassMail', action='send_list') }}">Send to List</button>
+                    {{ formhelpers.end_wrap() }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+$(document).ready(function () {
+
+    $('.recipient').prop('disabled', $('#recipients_all').prop('checked'));
+    $('.rank').prop('disabled', !$('#ranks_enable').prop('checked'));
+    $('.event').prop('disabled', !$('#events_enable').prop('checked'));
+    $('.contribution').prop('disabled', !$('#contributions_enable').prop('checked'));
+
+    {%- for group in activities %}
+    $('.{{ group['key']}}').prop('disabled', !$('#{{'act_'+group['key']}}').prop('checked'));
+    {%- endfor %}
+
+    $('#recipients_all').click(function () {
+        if ($(this).prop('checked')) {
+            $('.recipient').prop('disabled', true);
+        } else {
+            $('.recipient').prop('disabled', false);
+            $('.rank').prop('disabled', !$('#ranks_enable').prop('checked'));
+            $('.event').prop('disabled', !$('#events_enable').prop('checked'));
+            $('.contribution').prop('disabled', !$('#contributions_enable').prop('checked'));
+            {%- for group in activities %}
+            $('.{{ group['key']}}').prop('disabled', !$('#{{'act_'+group['key']}}').prop('checked'));
+            {%- endfor %}
+        }
+    });
+
+    $('#ranks_enable').click(function () {
+        if ($(this).prop('checked')) {
+            $('.rank').prop('disabled', false);
+        } else {
+            $('.rank').prop('disabled', true);
+        }
+    });
+
+    $('#events_enable').click(function () {
+        if ($(this).prop('checked')) {
+            $('.event').prop('disabled', false);
+        } else {
+            $('.event').prop('disabled', true);
+        }
+    });
+
+    $('#contributions_enable').click(function () {
+        if ($(this).prop('checked')) {
+            $('.contribution').prop('disabled', false);
+        } else {
+            $('.contribution').prop('disabled', true);
+        }
+    });
+
+    {%- for group in activities %}
+    $('#{{'act_'+group['key']}}').click(function () {
+        if ($(this).prop('checked')) {
+            $('.{{ group['key']}}').prop('disabled', false);
+        } else {
+            $('.{{ group['key']}}').prop('disabled', true);
+        }
+    });
+    {%- endfor %}
+
+});
+</script>
+
+{% endblock %}

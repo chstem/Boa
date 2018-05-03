@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sponsors</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="row img-center">
+{% for company_name, website, logo in sponsor_list | shuffle %}
+
+    <a href="{{ website }}" target="blank"><img src="{{ url_for('static', filename='logos/'+logo) }}" class="img-responsive logo-head" alt="{{ company_name }}" hspace="10"/></a>
+
+{% endfor %}
+</div>
+
+</body>
+</html>

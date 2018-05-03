@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">
+
+    <h2 class="text-center">
+        {{ reason }}
+        {# Session terminated for security reasons. #}
+    </h2>
+
+    <p>
+        Seeing this page has most probably one of the following two reasons:
+        <ul>
+            <li>Your browser does not allow cookies. This website uses cookies for managing users sessions. Please enable cookies for registration and abstract submission.</li>
+            <li>If you are inactive for a longer time, your CSRF token will be revoked. This is a security feature! Please reload the form and submit your data again.</li>
+        </ul>
+    </p>
+
+    <div class="row text-center">
+        <a href="{{ url  }}" class="btn btn-primary">Go Back</a>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

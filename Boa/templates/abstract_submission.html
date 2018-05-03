@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="container">
+    {% if deadline_talks %}
+        <h2 class="text-center">Talk Deadline: {{ deadline_talks }}</h2>
+        <h2 class="text-center">Poster Deadline: {{ deadline_poster }}</h2>
+    {% else %}
+        <h2 class="text-center">Submission Deadline: {{ deadline_poster }}</h2>
+    {% endif %}
+</div>
+
+{% block submission %}{% endblock %}
+
+{% endblock %}

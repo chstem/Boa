@@ -1,0 +1,238 @@
+% preamble used for the BoA and preview, to ensure the preview uses the exact same options as the final BoA
+
+\documentclass[paper=a5,fontsize=8pt,DIV=15,twoside,cleardoublepage=plain]{scrartcl}
+\pdfminorversion=4    % fixes Error 131 with Adobe Acrobat
+\usepackage{etoolbox}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman,english]{babel}
+
+% support for unicode char u+0219
+\makeatletter
+\ProvideTextCommandDefault\textcommabelow[1]
+  {\hmode@bgroup\ooalign{\null#1\crcr\hidewidth
+     \raise-.31ex\hbox{\check@mathfonts
+                       \fontsize\ssf@size\z@
+                       \math@fontsfalse\selectfont,}\hidewidth}\egroup}
+\makeatother
+\DeclareUnicodeCharacter{0219}{\textcommabelow{s}}
+
+\usepackage{textcomp}
+\usepackage[official]{eurosym}
+\DeclareUnicodeCharacter{20AC}{\euro{}}
+
+\usepackage{scrpage2}
+\usepackage{wallpaper,watermark,everypage}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage[babel]{csquotes}
+\usepackage{setspace}
+\usepackage[binary-units]{siunitx}
+\usepackage{time}
+\usepackage{adjustbox}
+\usepackage[super]{nth}
+
+%%% margins including trim (A5 + 3 mm at each side)
+%\setlength\paperwidth{154mm}
+%\setlength\paperheight{216mm}
+
+\usepackage[
+    includehead, includefoot,
+    % showframe,
+    inner=19mm,
+    outer=19mm,
+    top=3mm,
+    bottom=5mm,
+    headheight=5mm,
+    headsep=10mm,
+    footskip=10mm
+]{geometry}
+
+
+%%% additional options/commands
+\usepackage[version=3]{mhchem}
+\newcommand{\ch}{\ce} % compatibility to chemmacros
+
+\setkomafont{sectioning}{\normalcolor\bfseries}
+
+\newcommand{\abstractspath}{abstracts}
+
+% footnotes (for references)
+\renewcommand{\thefootnote}{[\arabic{footnote}]}
+\newcommand{\uncitedfootnote}[1]{\addtocounter{footnote}{1}\footnotetext{#1}}
+
+\makeatletter
+\def\blfootnote{\xdef\@thefnmark{}\@footnotetext}
+\makeatother
+
+% \usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,                % show bookmarks bar?
+    unicode=true,                  % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,               % show Acrobat’s toolbar?
+    pdfmenubar=true,               % show Acrobat’s menu?
+    pdffitwindow=false,            % window fit to page when opened
+    pdfstartview={FitH},           % fits the width of the page to the window
+    pdftitle={},                   % title
+    pdfauthor={},                  % author
+    pdfsubject={},                 % subject of the document
+    pdfcreator={},                 % creator of the document
+    pdfproducer={},                % producer of the document
+    pdfkeywords={} {} {},          % list of keywords
+    pdfnewwindow=true,             % links in new window
+    linktoc=all,                   % Verlinkung im Inhaltsverzeichnis
+%     colorlinks=true,               % false: boxed links; true: colored links
+%     linkcolor=black,               % color of internal links (change box color with linkbordercolor)
+%     citecolor=black,               % color of links to bibliography
+%     filecolor=black,               % color of file links
+%     urlcolor=black,                % color of external links
+    pdftex
+}
+
+% ifgraphicexist
+\makeatletter
+\newif\ifgraphicexist
+
+\catcode`\*=11
+\newcommand\imagetest[1]{%
+    \begingroup
+    \global\graphicexisttrue
+    \let\input@path\Ginput@path
+    \filename@parse{#1}%
+    \ifx\filename@ext\relax
+        \@for\Gin@temp:=\Gin@extensions\do{%
+        \ifx\Gin@ext\relax
+            \Gin@getbase\Gin@temp
+        \fi}%
+    \else
+        \Gin@getbase{\Gin@sepdefault\filename@ext}%
+        \ifx\Gin@ext\relax
+        \global\graphicexistfalse
+        \def\Gin@base{\filename@area\filename@base}%
+        \edef\Gin@ext{\Gin@sepdefault\filename@ext}%
+        \fi
+    \fi
+    \ifx\Gin@ext\relax
+            \global\graphicexistfalse
+        \else
+        \@ifundefined{Gin@rule@\Gin@ext}%
+            {\global\graphicexistfalse}%
+            {}%
+        \fi
+    \ifx\Gin@ext\relax
+    \gdef\imageextension{unknown}%
+    \else
+    \xdef\imageextension{\Gin@ext}%
+    \fi
+    \endgroup
+    \ifgraphicexist
+    \expandafter \@firstoftwo
+    \else
+    \expandafter \@secondoftwo
+    \fi
+ }
+\catcode`\*=12
+\makeatother
+
+
+\setlength\parindent{0pt}            % remove indentation at the beginning of paragraphs
+\date{}                        % remove date in title
+\newcommand{\sep}{, }
+\newcommand{\septitle}{\vspace{5pt}}
+\newcommand{\reinitializeparameters}{
+    \renewcommand{\TheType}{TYPE}
+    \renewcommand{\TheCat}{CATEGORY}
+    \renewcommand{\TheTitle}{TITLE}
+    \boolfalse{UseGraphic}
+    \renewcommand{\TheWidth}{1.0}
+    \renewcommand{\TheCaption}{FIGURECAPTION}
+%     \renewcommand{\TheFootnotes}{}
+    \renewcommand{\TheNr}{}
+    \renewcommand{\TheLabel}{}
+    \renewcommand{\TheTime}{}
+}
+
+
+%%% initialize commands containing data
+
+\newcommand{\TheID}{}
+\newcommand{\TheType}{}
+\newcommand{\TheCat}{}
+\newcommand{\TheTitle}{}
+\newbool{UseGraphic}    % initialized as false
+\newcommand{\TheWidth}{}
+\newcommand{\TheCaption}{}
+% \newcommand{\TheFootnotes}{}
+\newcommand{\TheNr}{}
+\newcommand{\TheLabel}{}
+\newcommand{\TheTime}{}
+
+%%% place title (only for invited abstracts)
+\newcommand{\placetitle}{
+    \vspace{12pt}
+    \begin{center}
+    \LARGE
+    \textbf{\TheTitle}\\
+    \normalsize
+    \end{center}
+    \vspace{12pt}
+}
+
+%%% place figure
+
+\makeatletter
+\newcommand{\placefigure}{%
+    \@ifstar
+        \placefigureStar%
+        \placefigureNoStar%
+}
+\makeatother
+
+\newcommand{\placefigureNoStar}{
+    \ifbool{UseGraphic}{
+
+        % space before figure
+        \vspace{10pt}
+
+        % place figure within float environment and use \caption{}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=\TheWidth\textwidth]{abstracts/\TheID/figure}\\
+            \ifdefstring{\TheCaption}{}{}{
+                \parbox{0.8\textwidth}{\caption*{\TheCaption}}
+            }
+        \end{figure}
+
+        % set UseGraphic to false to avoid a second figure placement
+        \boolfalse{UseGraphic}
+
+    }{}
+}
+
+\newcommand{\placefigureStar}{
+    \ifbool{UseGraphic}{
+
+        % space before figure
+        \vfill
+
+        % place figure within float environment and use \caption{}
+        \begin{figure}[h!]
+            \centering
+            \includegraphics[width=\TheWidth\textwidth]{abstracts/\TheID/figure}\\
+            \ifdefstring{\TheCaption}{}{}{
+                \parbox{0.8\textwidth}{\caption*{\TheCaption}}
+            }
+        \end{figure}
+
+        % space after figure
+        \vfill
+
+        % set UseGraphic to false to avoid a second figure placement
+        \boolfalse{UseGraphic}
+
+    }{}
+}

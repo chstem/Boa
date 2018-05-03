@@ -1,0 +1,16 @@
+{% extends "registration.html" %}
+{% block registration_form %}
+
+<div class="container">
+    <div class="jumbotron">
+        {% if not address %}
+            <p>Registration for <q>{{ rank }}</q> successful.</p>
+            <p>ID: {{ ID }}</p>
+        {% else %}
+            <p>Registration successful, you will receive a confirmation email soon. You can now <a href="{{ url_for('abstract_submission') }}">submit your abstract</a>.</p>
+            <p>Your ID is: {{ ID }}</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

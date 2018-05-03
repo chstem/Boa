@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{# block head %}
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+</style>
+{% endblock #}
+
+{% block body %}
+
+<center>
+    <h1 class=".text-centered">{{ conference_acronym+' '+year }} - Feedback Results</h1>
+</center>
+
+<div class="container">
+
+    <table>
+    {% for question in questions %}
+
+        {% if loop.index > 1 %}
+            <tr><td><br /></td></tr>
+        {% endif %}
+
+        {% if question['type'] == 'category' %}
+
+        <tr>
+            <td><h3>{{ question['label'] }}</h3></td>
+        </tr>
+
+        {% elif question['type'] == 'radio' %}
+
+            <tr>
+                <td><big>{{ question['label'] }}</big></td>
+            </tr>
+
+            {% for label, count in question['results'].items() %}
+                <tr>
+                    <td>{{ label }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+
+        {% elif question['type'] == 'radio_int' %}
+
+            <tr>
+                <td><big>{{ question['label'] }}</big></td>
+            </tr>
+
+            {% if plot_figures %}
+
+                <tr><td>
+                    <img src="{{ url_for('feedback.figures', survey=survey, key=question['key']) }}" width="50%">
+                </td></tr>
+
+            {% else %}
+
+
+                {% for label, count in question['results'].items() %}
+                    {% if not label in ('average', 'median', 'std') %}
+                        <tr>
+                            <td>{{ label }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>median</td>
+                    <td>{{ question['results']['median']|format }}</td>
+                </tr>
+                <tr>
+                    <td>average</td>
+                    <td>{{ question['results']['average']|format }}</td>
+                </tr>
+                <tr>
+                    <td>standard deviation</td>
+                    <td>{{ question['results']['std']|format }}</td>
+                </tr>
+
+            {% endif %}
+
+        {% elif question['type'] == 'multi' %}
+
+            <tr>
+                <td><big>{{ question['label'] }}</big></td>
+                <td></td>
+            </tr>
+
+            {% for label, count in question['results'].items() %}
+                {% if label != 'other' %}
+                    <tr>
+                        <td>{{ label }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+            {% if 'other' in question['results'].keys() %}
+                <tr>
+                    <td>other</td>
+                    <td><ul>
+                        {% for entry in question['results']['other'] %}
+                            <li>{{ entry}}</li>
+                        {% endfor %}
+                    </ul></td>
+                </tr>
+            {% endif %}
+
+        {% else %}
+
+            <tr>
+                <td><big>{{ question['label'] }}</big></td>
+            </tr>
+            <tr>
+                <td><ul>
+                    {% for result in question['results'] %}
+                        <li>{{ result }}</li>
+                    {% endfor %}
+                </ul></td>
+            </tr>
+
+        {% endif %}
+
+    {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}
