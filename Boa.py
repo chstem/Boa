@@ -4,6 +4,9 @@ from __future__ import unicode_literals, print_function
 import argparse
 import os
 
+# avoid logger setup for Boa.app during import
+os.environ['FLASK_ENV'] = 'config'
+
 ### top-level parser
 parser = argparse.ArgumentParser(description='Boa command line interface.')
 subparsers = parser.add_subparsers()
