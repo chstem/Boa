@@ -88,7 +88,7 @@ def export(args):
     from Boa.modules import database as db
     from Boa.modules import export
     from codecs import open
-    db_session = db.create_db_session()
+    db_session = db.create_session()
 
     if args.cmd == 'abstract':
         if not args.ID:
