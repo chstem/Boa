@@ -14,7 +14,6 @@ from ...utils import create_parameter_dict
 ##########################
 
 class Abstract(BaseForm):
-
     ID = StringField('ID')
     Label = StringField('Label')
     time_slot = StringField('Time')
@@ -25,9 +24,6 @@ class Abstract(BaseForm):
     submitted = BooleanField('submitted')
 
 class Abstracts(BaseForm):
-
-    btest = StringField('', [validators.AnyOf('')])    # Bot Protection
-
     filter_contribution = SelectField('filter contribution:', choices=[('all','all'), ('talk','Talk'), ('poster', 'Poster')], default='all')
     filter_submitted = SelectField('filter submitted:', choices=[('all','all'), ('yes','yes'), ('no', 'no')], default='all')
 
@@ -91,8 +87,7 @@ def show(action=''):
     # add session field to abstract form
     sessions = [s.name for s in db_session.query(database.Session)]
     session_choices = [('', '')] + [(s, s) for s in sessions]
-    print(session_choices)
-    AbstractForm = Abstract.append_field('session', SelectField('Options', choices=session_choices))
+    AbstractForm = Abstract.append_field('session', SelectField('Session', choices=session_choices))
 
     # update on submit
     if action == 'save':
