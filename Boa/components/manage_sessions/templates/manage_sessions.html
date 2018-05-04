@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+
+
+{% block body %}
+
+<div class="container">
+    <center>
+        <h1>{{ conference_acronym+' '+year }} - Sessions management</h1>
+    </center>
+</div>
+
+<div class="container">
+    <form action="{{ url_for('manage_sessions.show', action='sort') }}" method="post" class="form-horizontal" role="form">
+
+        {{ form.hidden_tag() }}
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-3">
+                    {{ formhelpers.render_field(form.sort_by, col0=5) }}
+                </div>
+                <div class="col-sm-6">
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_sessions.show', action='sort') }}">Sort</button>
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_sessions.show', action='add') }}">Add Session</button>
+                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_sessions.show', action='save') }}">Save</button>
+                </div>
+            </div>
+
+            <br />
+            <br />
+
+            <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for session in form.sessions %}
+                    <tr>
+                        <td>
+                            {{ session.ID.data }}
+                            <input type="hidden" id="sessions-{{ loop.index-1 }}-ID" name="sessions-{{ loop.index-1 }}-ID" readonly title="" type="text" value="{{ session.ID.data }}">
+                        </td>
+                        <td>
+                            <input id="sessions-{{ loop.index-1 }}-namefield" name="sessions-{{ loop.index-1 }}-namefield" title="" type="text" value="{{ session.namefield.data }}">
+                        </td>
+                        <td>
+                            <input id="sessions-{{ loop.index-1 }}-time_slot" name="sessions-{{ loop.index-1 }}-time_slot" title="" type="text" value="{{ session.time_slot.data }}">
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_sessions.show', action='delete', ID=session.ID.data) }}">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+
+        </div>
+
+    </form>
+</div>
+{% endblock %}

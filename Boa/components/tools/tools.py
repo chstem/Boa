@@ -28,6 +28,8 @@ def tools():
         manage_pages.append(['Participants', url_for('manage_participants.show')])
     if 'manage_abstracts' in components_loaded:
         manage_pages.append(['Abstracts', url_for('manage_abstracts.show')])
+    if 'manage_sessions' in components_loaded:
+        manage_pages.append(['Sessions', url_for('manage_sessions.show')])
 
     # remaining components
     components = []

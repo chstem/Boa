@@ -9,10 +9,6 @@ from ...modules import database, config
 from ...modules.forms import LoginPW, BaseForm, StringField, BooleanField, IntegerField, SelectField, FieldList, FormField, validators
 from ...utils import create_parameter_dict
 
-#######################################
-###  manage abstract order for BoA  ###
-#######################################
-
 ##########################
 ###  form definitions  ###
 ##########################
@@ -89,11 +85,13 @@ def show(action=''):
     form = Abstracts()
     para = create_parameter_dict()
 
+    # create database session
+    db_session = database.create_session()
+
     # update on submit
     if action == 'save':
         if form.validate_on_submit():
-            # create database session
-            db_session = database.create_session()
+
             # get data
             while form.abstracts:
                 form_abstract = form.abstracts.pop_entry()
@@ -116,9 +114,6 @@ def show(action=''):
                     raise
                 finally:
                     db_session.close()
-
-    # create database session
-    db_session = database.create_session()
 
     # empty form list
     while form.abstracts:

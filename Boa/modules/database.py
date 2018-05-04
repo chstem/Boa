@@ -28,9 +28,9 @@ def toascii(ustr):
 
 create_session = sessionmaker(bind=engine)
 
-######################################
-###  Participant and Abstract Data ###
-######################################
+#######################################
+###  Participant and Abstract Data  ###
+#######################################
 
 BaseData = declarative_base()
 
@@ -106,6 +106,8 @@ class Abstract(BaseData):
 
     authors = relationship('Author', backref='abstract', cascade='all, delete, delete-orphan')
     affiliations = relationship('Affiliation', backref='abstract', cascade='all, delete')
+    session_id = Column(Integer, ForeignKey('sessions.ID'))
+    session = relationship('Session', back_populates='abstracts')
 
     def get_mainauthor(self):
         for author in self.authors:
@@ -149,8 +151,6 @@ class Author(BaseData):
     lastname = Column(Unicode(100, collation=collation), nullable=False)
     affiliation_keys = Column(String(9), default='', nullable=False)
 
-    #participant_id = Column(String(ID.length), ForeignKey('participants.ID'))
-
     @property
     def fullname(self):
         return '%s %s' %(self.firstname, self.lastname)
@@ -178,6 +178,13 @@ class Affiliation(BaseData):
 
     def __repr__(self):
         return toascii('<Affiliation(institute=\'%s\')>' %self.institute)
+
+class Session(BaseData):
+    __tablename__ = 'sessions'
+    ID = Column(Integer, primary_key=True)
+    name = Column(Unicode(100, collation=collation), nullable=False, default='')
+    time_slot = Column(String(50), nullable=False, default='')
+    abstracts = relationship('Abstract', back_populates='session')
 
 #########################
 ###  Log Sent Emails  ###

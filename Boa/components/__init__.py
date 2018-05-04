@@ -9,7 +9,7 @@ if not config.components.enable or config.components.enable == 'none':
 elif config.components.enable == 'all':
     components_loaded = config.components.components_list
 elif config.components.enable == 'main':
-    components_loaded = ['BoA_online', 'manage_participants', 'manage_abstracts', 'MassMail', 'tools']
+    components_loaded = ['BoA_online', 'manage_participants', 'manage_abstracts', 'manage_sessions', 'MassMail', 'tools']
 else:
     components_loaded = [c for c in config.components.enable if c in config.components.components_list]
 

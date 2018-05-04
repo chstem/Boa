@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="container">
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> Invalid password.
+        </div>
+    {% endif %}
+
+    <h1>{{ conference_acronym+' '+year }} - Sessions management</h1>
+
+</div>
+
+
+<div class="container">
+<form action="{{ url_for('manage_sessions.login') }}" method="post" class="form-inline" role="form">
+
+    {{ form.hidden_tag() }}
+    {{ form.btest(class='btest') }}
+
+    <div class="row">
+        <div class="col-sm-2 col-md-2 col-lg-2"></div>
+        <div class="col-sm-8 col-md-8 col-lg-8">
+            {{ formhelpers.render_field(form.password, wrapped=False, autofocus=True) }}
+            <button type="submit" class="btn btn-primary">Continue</button>
+        </div>
+        <div class="col-sm-2 col-md-2 col-lg-2"></div>
+    </div>
+
+    {% if login_failed %}
+        <font color=red>Wrong password.</font>
+    {% endif %}
+
+</form>
+</div>
+
+{% endblock %}

@@ -8,10 +8,6 @@ from ...modules import database, config, Email
 from ...modules.forms import LoginPW, BaseForm, StringField, BooleanField, IntegerField, SelectField, FieldList, FormField, validators
 from ...utils import create_parameter_dict, get_ranks
 
-####################################################
-###  check participans: small database frontend  ###
-####################################################
-
 confirm_payment = config.mail.confirm_payment
 
 ############################
@@ -115,12 +111,13 @@ def show(action=''):
     form.filter_rank.choices += rank_choices
     para = create_parameter_dict()
 
+    # create database session
+    db_session = database.create_session()
+
     # update on submit
     if action == 'save':
         if form.validate_on_submit():
-
-            # create database session
-            db_session = database.create_session()
+            
             # get data
             while form.participants:
 
@@ -158,9 +155,6 @@ def show(action=''):
                     raise
                 finally:
                     db_session.close()
-
-    # create database session
-    db_session = database.create_session()
 
     # empty form list
     while form.participants:
