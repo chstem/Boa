@@ -182,7 +182,7 @@ class Affiliation(BaseData):
 class Session(BaseData):
     __tablename__ = 'sessions'
     ID = Column(Integer, primary_key=True)
-    name = Column(Unicode(100, collation=collation), nullable=False, default='')
+    name = Column(Unicode(100, collation=collation), nullable=False, default='', unique=True)
     time_slot = Column(String(50), nullable=False, default='')
     abstracts = relationship('Abstract', back_populates='session')
 

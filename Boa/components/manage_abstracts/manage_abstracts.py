@@ -88,6 +88,12 @@ def show(action=''):
     # create database session
     db_session = database.create_session()
 
+    # add session field to abstract form
+    sessions = [s.name for s in db_session.query(database.Session)]
+    session_choices = [('', '')] + [(s, s) for s in sessions]
+    print(session_choices)
+    AbstractForm = Abstract.append_field('session', SelectField('Options', choices=session_choices))
+
     # update on submit
     if action == 'save':
         if form.validate_on_submit():
@@ -105,6 +111,9 @@ def show(action=''):
                 db_abstract.label = form_abstract.Label.data if form_abstract.Label.data else None
                 db_abstract.time_slot = form_abstract.time_slot.data
                 db_abstract.category = form_abstract.category.data
+                session_name = form_abstract.session.data
+                session_ = db_session.query(database.Session).filter(database.Session.name == session_name).one()
+                db_abstract.session = session_
 
                 # save changes to database
                 try:
@@ -156,7 +165,7 @@ def show(action=''):
 
     # populate form
     for abstract in abstracts:
-        form_abstract = Abstract()
+        form_abstract = AbstractForm()
         form_abstract.ID = abstract.participant.ID
         form_abstract.Label = abstract.label
         form_abstract.time_slot = abstract.time_slot
@@ -165,6 +174,7 @@ def show(action=''):
         form_abstract.title = abstract.title
         form_abstract.participant = abstract.participant.fullnamel
         form_abstract.submitted = abstract.participant.abstract_submitted
+        form_abstract.session = abstract.session.name if abstract.session else ''
         form.abstracts.append_entry(form_abstract)
 
     db_session.close()

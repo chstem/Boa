@@ -58,7 +58,8 @@
         <div class="row">
             <label class="col-sm-1">ID</label>
             <label class="col-sm-1">Label</label>
-            <label class="col-sm-2">Time</label>
+            <label class="col-sm-1">Time</label>
+            <label class="col-sm-1">Session</label>
             <label class="col-sm-2">Participant</label>
             <label class="col-sm-2">Title</label>
             <label class="col-sm-2">Category</label>
@@ -79,8 +80,11 @@
                 <div class="col-sm-1">
                     {{ formhelpers.render_field(abstract.Label, hide_label=True, wrapped=False, readonly=False) }}
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-1">
                     {{ formhelpers.render_field(abstract.time_slot, hide_label=True, wrapped=False, readonly=False) }}
+                </div>
+                <div class="col-sm-1">
+                    {{ formhelpers.render_field(abstract.session, hide_label=True, wrapped=False, readonly=False) }}
                 </div>
                 <div class="col-sm-2">
                     {{ formhelpers.render_field(abstract.participant, hide_label=True, wrapped=False, readonly=True) }}
