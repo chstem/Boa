@@ -628,7 +628,7 @@ def abstract_submission():
 
         else:
             if not 'img_upload' in form.errors.keys():
-                upload_abstract_figure(participant, form, request)
+                utils.upload_abstract_figure(participant, form, request)
 
                 # save to database
                 try:
@@ -639,7 +639,7 @@ def abstract_submission():
                     raise
 
             if participant.rank in config.registration.ranks_invited and not 'portrait_upload' in form.errors.keys():
-                upload_portrait(participant, request)
+                utils.upload_portrait(participant, request)
 
         # update possibly changed data
         form.img_use.data = participant.abstract.img_use
@@ -698,7 +698,7 @@ def create_preview():
 
     # create form
     if request.method == 'GET':
-        form = populate_abstract_form(participant)
+        form = utils.populate_abstract_form(participant)
     elif request.method == 'POST':
         form = utils.create_abstract_form(participant)
 
@@ -737,7 +737,7 @@ def create_preview():
 
             if not 'img_upload' in form.errors.keys():
 
-                upload_abstract_figure(participant, form, request)
+                utils.upload_abstract_figure(participant, form, request)
 
                 # save to database
                 try:
@@ -749,7 +749,7 @@ def create_preview():
 
             if participant.rank in config.registration.ranks_invited and not 'portrait_upload' in form.errors.keys():
 
-                upload_portrait(participant, request)
+                utils.upload_portrait(participant, request)
 
     # check if img_use updated
     form.img_use.data = participant.abstract.img_use

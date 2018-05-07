@@ -187,6 +187,75 @@ def submit_abstract(participant, form, request):
 
     return 1    # success
 
+def fix_markdown(participant):
+    """Correct Markdown input."""
+
+    # check if all brackets closed
+    delims = mc.check_balanced_delimiters(participant.abstract.content, delims='{[')
+
+    if delims:
+        return participant
+
+    # correct missing math mode
+    participant.abstract.title = mc.ensure_mathmode(participant.abstract.title)
+    participant.abstract.content = mc.ensure_mathmode(participant.abstract.content)
+    participant.abstract.img_caption = mc.ensure_mathmode(participant.abstract.img_caption)
+
+    # remove figures
+    participant.abstract.title = mc.filter_figures(participant.abstract.title)
+    participant.abstract.content = mc.filter_figures(participant.abstract.content)
+    participant.abstract.img_caption = mc.filter_figures(participant.abstract.img_caption)
+
+    return participant
+
+def make_preview(ID, halt_latex=True):
+    export.cycle_files(ID)
+    export.write_tex(ID)
+    cmd = ['bash', os.path.join(config.paths.BoA,'make_preview.sh'), '-d', ID]
+    if halt_latex:
+        cmd.append('-h')
+    Popen(cmd)
+
+#################
+###  figures  ###
+#################
+
+def figure_available(ID):
+    if ID == 'example':
+        for filename in os.listdir('static'):
+            if filename.startswith('abstract_example_figure'):
+                return filename.rsplit('.', 1)[1].lower()
+
+    path = os.path.join(config.paths.abstracts,ID)
+    if os.path.isdir(path):
+        for filename in os.listdir(path):
+            if filename.startswith('figure'):
+                return filename.rsplit('.', 1)[1].lower()
+
+    return False
+
+def delete_figure(ID):
+    path = os.path.join(config.paths.abstracts,ID)
+    for filename in os.listdir(path):
+        if filename.startswith('figure'):
+            os.remove(os.path.join(path, filename))
+
+def portrait_available(ID):
+    path = os.path.join(config.paths.abstracts,ID)
+    if os.path.isdir(path):
+        for filename in os.listdir(path):
+            if filename.startswith('portrait'):
+                return filename.rsplit('.', 1)[1].lower()
+
+    return False
+
+def delete_portrait(ID):
+    path = os.path.join(config.paths.abstracts,ID)
+    for filename in os.listdir(path):
+        if filename.startswith('portrait'):
+            os.remove(os.path.join(path, filename))
+
+
 def upload_abstract_figure(participant, form, request):
 
     ## delete figure
@@ -230,32 +299,3 @@ def upload_portrait(participant, request):
             delete_portrait(participant.ID)
             # save figure
             fup.save(os.path.join(abstract_dir, 'portrait.'+file_extension))
-
-def fix_markdown(participant):
-    """Correct Markdown input."""
-
-    # check if all brackets closed
-    delims = mc.check_balanced_delimiters(participant.abstract.content, delims='{[')
-
-    if delims:
-        return participant
-
-    # correct missing math mode
-    participant.abstract.title = mc.ensure_mathmode(participant.abstract.title)
-    participant.abstract.content = mc.ensure_mathmode(participant.abstract.content)
-    participant.abstract.img_caption = mc.ensure_mathmode(participant.abstract.img_caption)
-
-    # remove figures
-    participant.abstract.title = mc.filter_figures(participant.abstract.title)
-    participant.abstract.content = mc.filter_figures(participant.abstract.content)
-    participant.abstract.img_caption = mc.filter_figures(participant.abstract.img_caption)
-
-    return participant
-
-def make_preview(ID, halt_latex=True):
-    export.cycle_files(ID)
-    export.write_tex(ID)
-    cmd = ['bash', os.path.join(config.paths.BoA,'make_preview.sh'), '-d', ID]
-    if halt_latex:
-        cmd.append('-h')
-    Popen(cmd)
