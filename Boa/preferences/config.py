@@ -104,7 +104,7 @@ mail.SMTPSecure = 'STARTTLS'                            # 'STARTTLS', 'SSL', or 
 ################################################
 
 flask.MAX_FILE_SIZE = 5 * 1024**2   # max file size for uploaded figures (in Bytes)
-flask.test_port = 12345             # only for test deployment
+flask.test_port = 80                # only for test deployment
 flask.CSRF_ENABLED = True           # True is highly recommended
 flask.CSRF_TIME_LIMIT = 3600*6      # seconds until CSRF token becomes invalid
 flask.logIPs = True                 # log user IPs for statistics
