@@ -53,54 +53,59 @@ def abstract(ID):
 
     return render_template('show_abstract.html', **para)
 
+def get_sessions(db_session=None):
+    if _close_session:
+        db_session.close()
+    return session_list
+
 @blueprint.route('/abstractlist/')
 @cache.memoize(3600)
 def abstract_list():
     """List all abstracts."""
-
     para = create_parameter_dict()
     db_session = database.create_session()
-
-    # contributed Talks
-    talks = db_session.query(database.Abstract).join(database.Participant)\
-        .filter(database.Participant.contribution == 'Talk')\
-        .filter(database.Abstract.label != None)\
-        .order_by(database.Abstract.label)
-    talks = [t for t in talks if t.is_submitted]
-    para['talks'] = talks
-
-    # Poster
-    poster = db_session.query(database.Abstract).join(database.Participant)\
-        .filter(database.Participant.contribution == 'Poster')\
-        .filter(database.Abstract.label != None)\
-        .order_by(database.Abstract.label)
-    poster = [p for p in poster if p.is_submitted]
-    para['poster'] = poster
-
+    sessions = db_session.query(database.Session).order_by(database.Session.time_slot).all()
+    para['sessions'] = []
+    for session in sessions:
+        abstracts = [a for a in session.abstracts if a.is_submitted]
+        abstracts = sorted(abstracts, key=lambda x:x.label)
+        session_dict = {
+            'name' : session.name,
+            'time' : session.time_slot,
+            'abstracts' : abstracts
+        }
+        para['sessions'].append(session_dict)
     html = render_template('BoA_abstract_list.html', **para)
     db_session.close()
-
     return html
 
 @blueprint.route('/')
 @cache.memoize(3600)
 def TOC():
     """Book of Abstracts in HTML format."""
-
-    para = create_parameter_dict()
     db_session = database.create_session()
+    para = create_parameter_dict()
+    para['sections'] = []
 
     # get all Talks
     talks = db_session.query(database.Abstract).join(database.Participant)\
         .filter(database.Participant.contribution == 'Talk')\
         .order_by(database.Abstract.label)
-    para['talks'] = [talk for talk in talks if not talk.label in (None, '', 'plenary')]
+
+    para['sections'].append({
+        'name' : 'Talks',
+        'abstracts' : [talk for talk in talks if not talk.label in (None, '', 'plenary')],
+    })
 
     # get all Posters
     posters = db_session.query(database.Abstract).join(database.Participant)\
         .filter(database.Participant.contribution == 'Poster')\
         .order_by(database.Abstract.label)
-    para['poster'] = [p for p in posters if not p.label in (None, '')]
+
+    para['sections'].append({
+        'name' : 'Poster',
+        'abstracts' : [p for p in posters if not p.label in (None, '')],
+    })
 
     db_session.close()
 

@@ -1,0 +1,7 @@
+{% macro make_heading(name, time, sep='-') %}
+    {% if not time %}
+        {{ name }}
+    {% else %}
+        {{ name }} {{ sep }} {{ time }}
+    {% endif %}
+{% endmacro %}

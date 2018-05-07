@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% import  "utils.html" as utils %}
 
 {% block head %}
 <!-- load MathJax from CDN with enabled mhchem-->
@@ -21,19 +22,29 @@
 <div class="container">
     <h2>List of Abstracts</h2>
 
-    <h3>Contributed Talks</h3>
-    <ul>
-    {% for t in talks %}
-        <li><a href="{{ url_for('BoAonline.abstract', ID=t.label) }}">{{ t.label }} </a> {{ t.participant.fullname }}: {{ t.title|markdown|safe }}</li>
-    {% endfor %}
-    </ul>
+    {% for session in sessions %}
 
-    <h3>Poster</h3>
-    <ul>
-    {% for p in poster %}
-        <li><a href="{{ url_for('BoAonline.abstract', ID=p.label) }}">{{ p.label }} </a> {{ p.participant.fullname }}: {{ p.title|markdown|safe }}</li>
+        {% if session.abstracts|length == 1 %}
+
+            {% set a = session.abstracts[0] %}
+            <h4>
+                <a href="{{ url_for('BoAonline.abstract', ID=a.label) }}">{{ a.label }}</a>
+                {{ a.time_slot if a.time_slot }}
+                {{ a.participant.fullname }}: {{ a.title|markdown|safe }}
+            </h4>
+
+        {% else %}
+
+            <h3>{{ utils.make_heading(session['name'], session['time']) }}</h3>
+            <ul>
+            {% for a in session['abstracts'] %}
+                <li><a href="{{ url_for('BoAonline.abstract', ID=a.label) }}">{{ a.label }} </a> {{ a.participant.fullname }}: {{ a.title|markdown|safe }}</li>
+            {% endfor %}
+            </ul>
+
+        {% endif %}
+
     {% endfor %}
-    </ul>
 
 </div>
 

@@ -5,9 +5,14 @@ from flask import Blueprint, render_template, session, redirect, url_for
 import time
 
 
-from ...modules import database, config
+from ...modules import config, database
+from ...modules.cache import cache
 from ...modules.forms import LoginPW, BaseForm, StringField, BooleanField, IntegerField, SelectField, FieldList, FormField, validators
 from ...utils import create_parameter_dict
+
+from .. import components_loaded
+if 'BoA_online' in components_loaded:
+    from .. import BoA_online
 
 ##########################
 ###  form definitions  ###
@@ -97,27 +102,38 @@ def show(action=''):
             while form.abstracts:
                 form_abstract = form.abstracts.pop_entry()
                 ID = form_abstract.ID.data
-                db_abstract = db_session.query(database.Abstract).get(ID)
-                if not db_abstract:
-                    app.logger.warning('manage abstracts: ID not found: ' + ID)
-                    continue
 
-                db_abstract.participant.contribution = form_abstract.contribution.data
-                db_abstract.label = form_abstract.Label.data if form_abstract.Label.data else None
-                db_abstract.time_slot = form_abstract.time_slot.data
-                db_abstract.category = form_abstract.category.data
-                session_name = form_abstract.session.data
-                session_ = db_session.query(database.Session).filter(database.Session.name == session_name).one()
-                db_abstract.session = session_
+                with db_session.no_autoflush:
 
-                # save changes to database
-                try:
-                    db_session.commit()
-                except:
-                    db_session.rollback()
-                    raise
-                finally:
-                    db_session.close()
+                    db_abstract = db_session.query(database.Abstract).get(ID)
+                    if not db_abstract:
+                        app.logger.warning('manage abstracts: ID not found: ' + ID)
+                        continue
+
+                    db_abstract.participant.contribution = form_abstract.contribution.data
+                    db_abstract.label = form_abstract.Label.data if form_abstract.Label.data else None
+                    db_abstract.time_slot = form_abstract.time_slot.data
+                    db_abstract.category = form_abstract.category.data
+                    session_name = form_abstract.session.data
+                    if session_name:
+                        session_ = db_session.query(database.Session).filter(database.Session.name == session_name).one()
+                        db_abstract.session = session_
+                    else:
+                        db_abstract.session = None
+
+                    # save changes to database
+                    try:
+                        db_session.commit()
+                    except:
+                        db_session.rollback()
+                        raise
+                    finally:
+                        db_session.close()
+
+            # clear BoA cache
+            if 'BoA_online' in components_loaded:
+                cache.delete_memoized(BoA_online.abstract_list)
+                cache.delete_memoized(BoA_online.TOC)
 
     # empty form list
     while form.abstracts:
