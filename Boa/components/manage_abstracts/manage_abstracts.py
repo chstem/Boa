@@ -38,8 +38,6 @@ class Abstracts(BaseForm):
     sort_by = SelectField('sort by', choices=[('participant_id', 'ID'), ('label', 'Label'), ('participant', 'Participant'), ('title', 'Title'), ('category', 'Category')], default='label')
     sort_reverse =  BooleanField('reverse order')
 
-    abstracts = FieldList(FormField(Abstract))
-
 ########################
 ###  view functions  ###
 ########################
@@ -83,28 +81,65 @@ def show(action=''):
     if not 'intern' in session:
         return redirect(url_for('manage_abstracts.login'))
 
-    form = Abstracts()
     para = create_parameter_dict()
 
     # create database session
     db_session = database.create_session()
 
-    # add session field to abstract form
-    sessions = [s.name for s in db_session.query(database.Session)]
-    session_choices = [('', '')] + [(s, s) for s in sessions]
+    # get session_choices and create forms
+    session_choices = [('-1', '(no session)')]
+    for s in db_session.query(database.Session):
+        if s.time_slot:
+            label = '{} ({})'.format(s.name, s.time_slot)
+        else:
+            label = s.name
+        session_choices.append((str(s.ID), label))
+
     AbstractForm = Abstract.append_field('session', SelectField('Session', choices=session_choices))
+    AbstractsForm = Abstracts.append_field('abstracts', FieldList(FormField(AbstractForm)))
+    form = AbstractsForm()
 
     # update on submit
     if action == 'save':
-        if form.validate_on_submit():
+        if form.validate_on_submit() and form.abstracts:
 
-            # get data
+            # check for duplicate labels
+            labels_new = [f.Label.data for f in form.abstracts if f.Label.data]
+            abstracts_unchanged = db_session.query(database.Abstract).filter(
+                ~database.Abstract.participant_id.in_([f.ID.data for f in form.abstracts]))
+            labels_remain = [a.label for a in abstracts_unchanged if a.label]
+
+            if len(labels_new + labels_remain) != len(set(labels_new + labels_remain)):
+                form.errors['duplicate labels'] = True
+                return render_template('manage_abstracts.html', form=form, **para)
+
+            # clear BoA cache
+            if 'BoA_online' in components_loaded:
+                cache.delete_memoized(BoA_online.abstract_list)
+                cache.delete_memoized(BoA_online.TOC)
+
+            # FieldList wants us to use pop_entry()
+            # but we need some freedom in which order we deal with the abstract entries
+            # so we first move all subforms in a new list
+            subforms = []
             while form.abstracts:
-                form_abstract = form.abstracts.pop_entry()
-                ID = form_abstract.ID.data
+               subforms.append(form.abstracts.pop_entry())
 
+            # get all data
+            while subforms:
+
+                try:
+                    # first: check for abstracts with empty labels
+                    form_abstract = next(f for f in subforms if not f.Label.data)
+                except StopIteration:
+                    # next: find abstracts whose new label is currently not in database
+                    labels_current = db_session.query(database.Abstract.label).distinct().all()
+                    form_abstract = next(f for f in subforms if not f.Label.data in labels_current)
+
+                # update abstract in database
                 with db_session.no_autoflush:
 
+                    ID = form_abstract.ID.data
                     db_abstract = db_session.query(database.Abstract).get(ID)
                     if not db_abstract:
                         app.logger.warning('manage abstracts: ID not found: ' + ID)
@@ -114,26 +149,23 @@ def show(action=''):
                     db_abstract.label = form_abstract.Label.data if form_abstract.Label.data else None
                     db_abstract.time_slot = form_abstract.time_slot.data
                     db_abstract.category = form_abstract.category.data
-                    session_name = form_abstract.session.data
-                    if session_name:
-                        session_ = db_session.query(database.Session).filter(database.Session.name == session_name).one()
-                        db_abstract.session = session_
-                    else:
+                    session_id = form_abstract.session.data
+                    if session_id == '-1':
                         db_abstract.session = None
+                    else:
+                        db_abstract.session = db_session.query(database.Session).get(session_id)
 
-                    # save changes to database
-                    try:
-                        db_session.commit()
-                    except:
-                        db_session.rollback()
-                        raise
-                    finally:
-                        db_session.close()
+                # remove from FieldList
+                subforms.remove(form_abstract)
 
-            # clear BoA cache
-            if 'BoA_online' in components_loaded:
-                cache.delete_memoized(BoA_online.abstract_list)
-                cache.delete_memoized(BoA_online.TOC)
+                # save changes to database
+                try:
+                    db_session.commit()
+                except:
+                    db_session.rollback()
+                    raise
+                finally:
+                    db_session.close()
 
     # empty form list
     while form.abstracts:
@@ -185,7 +217,7 @@ def show(action=''):
         form_abstract.title = abstract.title
         form_abstract.participant = abstract.participant.fullnamel
         form_abstract.submitted = abstract.participant.abstract_submitted
-        form_abstract.session = abstract.session.name if abstract.session else ''
+        form_abstract.session = abstract.session.ID if abstract.session else '-1'
         form.abstracts.append_entry(form_abstract)
 
     db_session.close()

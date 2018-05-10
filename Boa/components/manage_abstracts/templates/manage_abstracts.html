@@ -24,7 +24,6 @@
 
     <div class="container">
 
-        <!-- filter -->
         <div class="row">
             <div class="col-sm-8">
                 {{ formhelpers.render_field(form.filter_text, col0=2) }}
@@ -61,6 +60,13 @@
             </div>
         </div>
         <br />
+
+        {% if form.errors.get('duplicate labels', False) %}
+            <div class="alert alert-danger">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error!</strong> Labels need to be unique. Please resolve duplicates.
+            </div>
+        {% endif %}
 
         {% for abstract in form.abstracts %}
 
