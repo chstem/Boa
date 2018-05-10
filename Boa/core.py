@@ -43,6 +43,9 @@ app.config['WTF_CSRF_ENABLED'] = config.flask.CSRF_ENABLED
 app.config['WTF_CSRF_SECRET_KEY'] = config.flask.CSRF_SECRET_KEY
 app.config['WTF_CSRF_TIME_LIMIT'] = config.flask.CSRF_TIME_LIMIT
 
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+
 if config.is_instance:
     # prefere instance specific templates
     app.jinja_loader.searchpath.insert(0, os.path.join(config.instance_path, 'templates'))
