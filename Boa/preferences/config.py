@@ -16,7 +16,7 @@ registration.enabled = True
 registration.start = strptime('01/01/2000 00:00', '%d/%m/%Y %H:%M')        # empty string to disable
 registration.deadline = strptime('01/01/2099 13:59', '%d/%m/%Y %H:%M')     # empty string to disable
 registration.earlybird = strptime('01/01/2099 23:59', '%d/%m/%Y %H:%M')    # empty string to disable
-registration.max_participants = 100             # 0 to disable feature
+registration.max_participants = 0               # 0 for infinite
 registration.reject_double_registration = True  # checks if email already in database
 registration.ranks = ['staff', 'participant']   # address required
 registration.ranks_invited = ['invited',]       # no address fields
@@ -107,7 +107,7 @@ flask.MAX_FILE_SIZE = 5 * 1024**2   # max file size for uploaded figures (in Byt
 flask.test_port = 80                # only for test deployment
 flask.CSRF_ENABLED = True           # True is highly recommended
 flask.CSRF_TIME_LIMIT = 3600*6      # seconds until CSRF token becomes invalid
-flask.logIPs = True                 # log user IPs for statistics
+flask.logIPs = False                # log user IPs for statistics
 flask.hashIPs = True                # anonymize IPs by hashing them
 
 # good secret keys may be generated with os.urandom(24)
