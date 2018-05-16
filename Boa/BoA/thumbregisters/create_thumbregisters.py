@@ -1,3 +1,4 @@
+from __future__ import print_function
 import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt
@@ -20,7 +21,7 @@ boxcolor = (0./255, 55./255, 108./255)      # dark blue
 boxcolor = (84./255, 171./255, 63./255)     # GDCh green
 categories = ['Greetings', 'Program', 'Talks', 'Poster', 'Index']
 boxheights = [42, 41, 41, 41, 41]    # in mm
-print 'check if this equals the pageheight in mm:', sum(boxheights)+(len(categories)-1)*boxsep/mm
+print('check if this equals the pageheight in mm:', sum(boxheights)+(len(categories)-1)*boxsep/mm)
 
 font = matplotlib.font_manager.FontProperties(family='sans', weight='bold', size=textsize)
 
@@ -30,7 +31,7 @@ pageheight += 2*ytrim
 pagewidth += 2*xtrim
 
 boxsep = boxsep/pageheight
-boxheights = map(lambda h:h*mm/pageheight, boxheights[::-1])
+boxheights = list(map(lambda h:h*mm/pageheight, boxheights[::-1]))
 
 boxwidth = boxwidth/pagewidth
 text_xoffset = text_xoffset/pagewidth
@@ -51,7 +52,7 @@ def make_thumb(side, color, index):
     elif color == 'black':
         bcolor = 'black'
     else:
-        raise ValueError, color
+        raise ValueError(color)
 
     # x coordinate + boxw
     if side == 'left':
@@ -63,7 +64,7 @@ def make_thumb(side, color, index):
         boxx = 1 - boxwidth - xtrim
         textx = 1 - text_xoffset - xtrim
     else:
-        raise ValueError, side
+        raise ValueError(side)
 
     boxw = boxwidth + xtrim
 
@@ -105,7 +106,7 @@ for side in ('left', 'right',):
         plt.close()
 
         # plot individually
-        for i, cat in enumerate(categories):https://github.com/chstem/Boa.git
+        for i, cat in enumerate(categories):
             fig = plt.figure(figsize=pagesize)
             ax = plt.gca()
             plt.axis('off')
