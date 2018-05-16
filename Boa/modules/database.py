@@ -187,6 +187,11 @@ class Session(BaseData):
     time_slot = Column(String(50, collation=collation), nullable=False, default='')
     abstracts = relationship('Abstract', back_populates='session')
 
+    def get_abstracts(self):
+        """Return submitted abstracts sorted by label."""
+        _abstracts = [a for a in self.abstracts if a.is_submitted]
+        return sorted(_abstracts, key=lambda a:a.label)
+
 #########################
 ###  Log Sent Emails  ###
 #########################

@@ -19,8 +19,8 @@ from . import TexCleaner as tc
 
 def check_abstract(ID):
 
-    session = create_session()
-    participant = session.query(Participant).get(ID)
+    db_session = create_session()
+    participant = db_session.query(Participant).get(ID)
 
     # perfrom checks on provided data
     problems = []
@@ -56,7 +56,7 @@ def check_abstract(ID):
     if config.submission.require_figure_caption and participant.abstract.img_use and not participant.abstract.img_caption:
         problems.append('Please provide a caption for your figure.')
 
-    session.close()
+    db_session.close()
 
     return problems
 
@@ -131,13 +131,13 @@ def write_tex(ID, mask_email=False):
         os.makedirs(target_dir)
 
     ## get participant
-    session = create_session()
+    db_session = create_session()
 
     if ID == 'example':
         from modules.abstract_example import participant
         copy('preferences/abstract_example_figure.pdf', os.path.join(target_dir,'figure.pdf'))
     else:
-        participant = session.query(Participant).get(ID)
+        participant = db_session.query(Participant).get(ID)
 
     ## load template
     fname = os.path.join(config.paths.BoA,'abstract_template_%s.tex' %participant.rank)
@@ -190,7 +190,7 @@ def write_tex(ID, mask_email=False):
     with codecs.open(os.path.join(target_dir, 'abstract.tex'),'w', encoding='utf-8') as fd:
         fd.write(tex)
 
-    session.close()
+    db_session.close()
 
 def export_abstract(ID):
     problems = check_abstract(ID)
@@ -269,6 +269,102 @@ def cycle_files(ID):
     os.rename(os.path.join(abstract_dir,'abstract.tex'), os.path.join(abstract_dir,'abstract.tex.1'))
     os.rename(os.path.join(abstract_dir,'%s.pdf' %ID), os.path.join(abstract_dir,'%s.pdf.1' %ID))
 
+##############################
+###  Sessions and Program  ###
+##############################
+
+def talks():
+    db_session = create_session()
+    sessions = db_session.query(Session).filter(Session.type == 'talk').order_by(Session.time_slot).all()
+
+    with open(os.path.join(config.paths.BoA, 'Talks.tex'), 'w', encoding='utf-8') as fd:
+        for session in sessions:
+
+            abstracts = session.get_abstracts()
+            if not abstracts:
+                continue
+
+            fd.write('\n')
+            fd.write('%%%%{:s}\n'.format(session.name))
+            fd.write('\\phantomsection\n')
+            fd.write('\\addcontentsline{{toc}}{{subsubsection}}{{{:s}}}\n'.format(session.name))
+            fd.write('\n')
+
+            for abstract in abstracts:
+                fd.write('%% {:s}: {:s}\n'.format(abstract.category, abstract.title))
+                fd.write('\\phantomsection\n')
+                fd.write('\\addcontentsline{{toc}}{{paragraph}}{{{:s} : {:s}}}\n'.format(abstract.time_slot, abstract.participant.fullnamel))
+                fd.write('\\includeabstract{{{:s}}}\n'.format(abstract.participant_id))
+                fd.write('\n')
+
+    db_session.close()
+
+def posters():
+    # TODO: group by poster session
+    # get all poster contributions
+    db_session = create_session()
+    participants = db_session.query(Participant).join(Abstract)\
+        .filter(Participant.contribution == 'Poster')\
+        .order_by(Abstract.label)\
+
+    # filter submitted abstracts
+    participants = [p for p in participants.all() if p.abstract_submitted]
+
+    # create Poster.tex
+    with open(os.path.join(config.paths.BoA, 'Posters.tex'), 'w', encoding='utf-8') as fd:
+        fd.writelines(['\\includeabstract{%s}\n' %p.ID for p in participants])
+
+    db_session.close()
+
+def timetable():
+
+    def writeline(fd, line):
+        fd.write(8*' ')     # indentation
+        fd.write(line)
+        fd.write('\\\\\n')  # newline
+
+    db_session = create_session()
+    sessions = db_session.query(Session).order_by(Session.time_slot).all()
+    with open(os.path.join(config.paths.BoA, 'Timetable.tex'), 'w', encoding='utf-8') as fd:
+
+        # head
+        fd.write('\\begin{center}\n')
+        fd.write('    \\setlength{\\extrarowheight}{.5em}\n')
+        fd.write('    \\large\n')
+        fd.write('    \\begin{tabular}{cl}\n')
+
+        # sessions
+        for session in sessions:
+            if session.type == 'talk':
+                abstracts = session.get_abstracts()
+                if len(abstracts) == 1:
+                    title = '{} {}'.format(session.name, abstracts[0].participant.titlename)
+                    writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(abstracts[0].time_slot, title))
+                elif abstracts:
+                    writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(session.time_slot, session.name))
+                    for abstract in abstracts:
+                        # name + institute
+                        line = '{:s} ({:s})'.format(abstract.participant.titlename, abstract.participant.institute)
+                        # parbox
+                        line = '\\parbox[t]{{0.6\\textwidth}}{{\\raggedright {:s}}}'.format(line)
+                        # add time
+                        line = '{{{:s}}} : {:s}'.format(abstract.time_slot, line)
+                        # hyperref
+                        line = ' \\hyperref[{:s}]{{{:s}}}'.format(abstract.participant_id, line)
+                        # tabular
+                        line = '    & \\normalsize ' + line
+                        # write to file
+                        writeline(fd, line)
+            else:
+                writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(session.time_slot, session.name))
+
+        # foot
+        fd.write('    \\end{tabular}\n')
+        fd.write('\\end{center}\n')
+
+    db_session.close()
+
+
 ######################################
 ###  Author and Participant Index  ###
 ######################################
@@ -301,8 +397,8 @@ def index():
 
     IndexList = []
     # get authors from database
-    session = create_session()
-    participants = session.query(Participant).all()
+    db_session = create_session()
+    participants = db_session.query(Participant).all()
 
     for participant in participants:
 
@@ -341,7 +437,7 @@ def index():
             else:
                 IndexList[iauth].coauthor.append(participant.ID)
 
-    session.close()
+    db_session.close()
 
     # sort IndexList alphabetically
     IndexList = sorted(IndexList, key=lambda x:x.name.lower())
@@ -360,7 +456,7 @@ def index():
         index += entry
 
     # write file
-    with codecs.open(os.path.join(paths.BoA, 'Index.tex'), 'w', encoding='utf-8') as fd:
+    with codecs.open(os.path.join(config.paths.BoA, 'Index.tex'), 'w', encoding='utf-8') as fd:
         fd.write(index)
 
 ############################
@@ -415,11 +511,11 @@ def export_to_json(ID):
     """Export participant from database to JSON."""
 
     # get participant from database
-    session = create_session()
-    participant = session.query(Participant).get(ID)
+    db_session = create_session()
+    participant = db_session.query(Participant).get(ID)
 
     if not participant:
-        session.close()
+        db_session.close()
         return
 
     # create dict
@@ -475,7 +571,7 @@ def export_to_json(ID):
     with codecs.open(os.path.join(config.paths.backup, fname), 'w', encoding='utf-8') as fd:
         json.dump(data, fd)
 
-    session.close()
+    db_session.close()
 
     # copy figure(s)
     for fname in glob(os.path.join(config.paths.abstracts,ID,'figure.*')):
@@ -514,13 +610,13 @@ def import_json(ID, change_ID=None):
         participant.abstract = abstract
 
     # add to database
-    session = create_session()
+    db_session = create_session()
     try:
-        session.add(participant)
-        session.commit()
+        db_session.add(participant)
+        db_session.commit()
     except:
-        session.rollback()
-        session.close()
+        db_session.rollback()
+        db_session.close()
         raise
 
     # restore figure(s)
@@ -531,4 +627,4 @@ def import_json(ID, change_ID=None):
                 os.mkdir(os.path.join(config.paths.abstracts,participant.ID))
             copy(fname, os.path.join(config.paths.abstracts,participant.ID,'figure.%s' %ext))
 
-    session.close()
+    db_session.close()

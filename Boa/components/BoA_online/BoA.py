@@ -67,12 +67,10 @@ def abstract_list():
     sessions = db_session.query(database.Session).order_by(database.Session.time_slot).all()
     para['sessions'] = []
     for session in sessions:
-        abstracts = [a for a in session.abstracts if a.is_submitted]
-        abstracts = sorted(abstracts, key=lambda x:x.label)
         session_dict = {
             'name' : session.name,
             'time' : session.time_slot,
-            'abstracts' : abstracts
+            'abstracts' : session.get_abstracts(),
         }
         para['sessions'].append(session_dict)
     html = render_template('BoA_abstract_list.html', **para)

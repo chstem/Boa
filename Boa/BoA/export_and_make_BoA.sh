@@ -7,6 +7,7 @@ cd ..
 Boa.py export abstracts --mask_email
 Boa.py export talks
 Boa.py export posters
+Boa.py export timetable
 Boa.py export index
 
 # go back and create BoA

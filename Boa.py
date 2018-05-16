@@ -98,8 +98,8 @@ def export(args):
 
     elif args.cmd == 'abstracts':
         # export all abstracts
-        abstracts = db_session.query(db.Abstract).filter(db.Abstract.is_submitted).all()
-        IDs = [abstract.participant.ID for abstract in abstracts]
+        abstracts = db_session.query(db.Abstract).all()
+        IDs = [abstract.participant.ID for abstract in abstracts if abstract.is_submitted]
         for ID in IDs:
             export.write_tex(ID, mask_email=args.mask_email)
 
@@ -107,21 +107,13 @@ def export(args):
         export.index()
 
     elif args.cmd == 'posters':
-        # get all poster contributions
-        participants = db_session.query(db.Participant).join(db.Abstract)\
-            .filter(db.Participant.contribution == 'Poster')\
-            .order_by(db.Abstract.label)\
-
-        # filter submitted abstracts
-        participants = [p for p in participants.all() if participant.abstract_submitted]
-
-        # create Poster.tex
-        with open(os.path.join(paths.BoA, 'Posters.tex'), 'w', encoding='utf-8') as fd:
-            fd.writelines(['\\includeabstract{%s}\n' %p.ID for p in participants])
+        export.posters()
 
     elif args.cmd == 'talks':
-        # get all talk contributions
-        raise NotImplementedError
+        export.talks()
+
+    elif args.cmd == 'timetable':
+        export.timetable()
 
     elif args.cmd == 'invoices':
         # export invoice data
@@ -140,7 +132,7 @@ def export(args):
 parser_export = subparsers.add_parser('export', help='database exports')
 parser_export.add_argument('cmd', choices=[
     'abstract', 'abstracts',
-    'index', 'posters', 'talks',
+    'index', 'posters', 'talks', 'timetable',
     'invoices', 'nametags', 'posternumbers',])
 parser_export.add_argument('-d', '--ID', help='abstract ID', default='')
 parser_export.add_argument('--mask_email', help='replace @ with [at]', action='store_true')
