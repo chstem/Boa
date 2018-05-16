@@ -13,13 +13,12 @@ from ...utils import create_parameter_dict
 ##########################
 
 class Session(BaseForm):
-
     ID = StringField('ID')
     namefield = StringField('Name')
+    typefield = SelectField('Type', choices=[('talk', 'talk'), ('poster', 'poster'), ('break', 'break'), ('other', 'other')], default='other')
     time_slot = StringField('Time')
 
 class Sessions(BaseForm):
-
     sort_by = SelectField('sort by', choices=[('ID', 'ID'), ('name', 'Name'), ('time_slot', 'Time')], default='ID')
     sessions = FieldList(FormField(Session))
 
@@ -82,12 +81,11 @@ def show(action='', ID=None):
 
                 form_session = form.sessions.pop_entry()
                 ID = form_session.ID.data
-                print(ID)
                 session_ = db_session.query(database.Session).get(ID)
                 if not session_:
                     continue
-                print(form_session.namefield.data, form_session.time_slot.data)
                 session_.name = form_session.namefield.data
+                session_.type = form_session.typefield.data
                 session_.time_slot = form_session.time_slot.data
 
                 # save changes to database
@@ -141,6 +139,7 @@ def show(action='', ID=None):
         session_form = Session()
         session_form.ID = session_.ID
         session_form.namefield = session_.name
+        session_form.typefield = session_.type
         session_form.time_slot = session_.time_slot
         form.sessions.append_entry(session_form)
 

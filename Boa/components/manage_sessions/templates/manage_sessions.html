@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
 
-
-
 {% block body %}
 
 <div class="container">
@@ -36,6 +34,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Type</th>
                     <th>Time</th>
                     <th></th>
                 </tr>
@@ -50,6 +49,9 @@
                         </td>
                         <td>
                             <input id="sessions-{{ loop.index-1 }}-namefield" name="sessions-{{ loop.index-1 }}-namefield" title="" type="text" value="{{ session.namefield.data }}">
+                        </td>
+                        <td>
+                            {{ formhelpers.render_field(session.typefield, hide_label=True) }}
                         </td>
                         <td>
                             <input id="sessions-{{ loop.index-1 }}-time_slot" name="sessions-{{ loop.index-1 }}-time_slot" title="" type="text" value="{{ session.time_slot.data }}">
