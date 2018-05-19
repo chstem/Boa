@@ -26,7 +26,7 @@ def markdown2html(markdown):
 
 def markdown2latex(markdown):
     pandoc = Popen(
-        ['pandoc', '--from='+markdown_reader, '--to=latex'],
+        ['pandoc', '--from='+markdown_reader+'-auto_identifiers', '--to=latex'],
         stdin=PIPE, stdout=PIPE
     )
     out, err = pandoc.communicate(markdown.encode('utf-8'))
