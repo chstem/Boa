@@ -6,25 +6,9 @@ import time
 
 from ...modules import database, config, Email
 from ...modules.forms import LoginPW, BaseForm, StringField, BooleanField, IntegerField, SelectField, FieldList, FormField, validators
-from ...utils import create_parameter_dict, get_ranks
+from ...utils import create_parameter_dict, get_ranks, send_confirm_payment_mail
 
 confirm_payment = config.mail.confirm_payment
-
-############################
-###  confirmation email  ###
-############################
-
-def send_confirm_payment_mail(participant):
-    para = create_parameter_dict(participant=participant)
-    para['recipient'] = para['participant'] # add synonym
-    Email.sendmail(
-        subject = '%s %s: Payment Confirmed' %(config.conference.conference_acronym, config.conference.year),
-        message = Email.render_mail('confirm_payment.html', **para),
-        fromaddr = config.mail.registration_email,
-        to_list = (para['participant'].email,),
-        mailformat='html',
-        ParticipantID = para['participant'].ID,
-    )
 
 ########################
 ###  view functions  ###
@@ -117,7 +101,7 @@ def show(action=''):
     # update on submit
     if action == 'save':
         if form.validate_on_submit():
-            
+
             # get data
             while form.participants:
 
@@ -145,7 +129,8 @@ def show(action=''):
                     db_participant.payment_confirmed = time.time()
 
                     if confirm_payment:
-                        send_confirm_payment_mail(db_participant)
+                        _para = create_parameter_dict(participant=db_participant)
+                        send_confirm_payment_mail(_para)
 
                 # save changes to database
                 try:

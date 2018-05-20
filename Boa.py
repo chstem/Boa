@@ -146,7 +146,7 @@ def part(args):
     db_session = db.create_session()
 
     if args.cmd == 'delete':
-        participant = db_session.query(Participant).get(args.ID)
+        participant = db_session.query(db.Participant).get(args.ID)
         if not participant:
             print('ID {} not found'.format(args.ID))
             return
@@ -169,7 +169,7 @@ def part(args):
         export.import_json(args.ID)
 
     elif args.cmd == 'send_reg_mail':
-        participant = db_session.query(Participant).get(args.ID)
+        participant = db_session.query(db.Participant).get(args.ID)
         if not participant:
             print('ID {} not found'.format(args.ID))
             return
@@ -180,10 +180,21 @@ def part(args):
             para['participant'] = participant
             para['ID'] = args.ID
             print('sending registration confirmed email to', participant.fullname, participant.ID, participant.email)
-            send_reg_mail(para, notify_admin=False)
+            send_reg_mail(para)
 
     elif args.cmd == 'send_paid_mail':
-        raise NotImplementedError
+        participant = db_session.query(db.Participant).get(args.ID)
+        if not participant:
+            print('ID {} not found'.format(args.ID))
+            return
+        from Boa import app
+        from Boa.utils import create_parameter_dict, send_confirm_payment_mail
+        para = create_parameter_dict()
+        with app.app_context():
+            para['participant'] = participant
+            para['ID'] = args.ID
+            print('sending payment confirmed email to', participant.fullname, participant.ID, participant.email)
+            send_confirm_payment_mail(para)
 
     db_session.close()
 

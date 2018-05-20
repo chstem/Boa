@@ -179,13 +179,3 @@ def render_mail(template_file, **context):
     """Search template file in instance and module."""
     template = env.get_template(template_file)
     return template.render(**context)
-    #fname = os.path.join(config.instance_path, 'mail_templates', template_file)
-    #if not os.path.isfile(fname):
-        #fname = os.path.join(config.module_path, 'mail_templates', template_file)
-        #if not os.path.isfile(fname):
-            #raise FileNotFoundError('template not found: {}'.format(template_file))
-    ## render_template raises TemplateNotFound if outside of app.template_folder
-    ## use render_template_string as a workaround
-    #with open(fname, encoding='utf-8') as fd:
-        #template_string = fd.read()
-    #return render_template_string(template_string, **context)

@@ -56,19 +56,27 @@ def registration_isclosed():
 #############################
 
 def send_reg_mail(para):
-
-    # add synonym
-    para['recipient'] = para['participant']
-
-    # get registration fee
+    """Send mail to newly registered participant."""
+    para['recipient'] = para['participant'] # add synonym
     para['fee'] = config.calc_fee(para['participant'])
-
-    # send mail to newly registered participant
     sendmail(
         subject = '%s %s: Registration confirmed' %(config.conference.conference_acronym, config.conference.year),
         message = render_mail('confirm_registration.html', **para),
         fromaddr = config.mail.registration_email,
         to_list = [para['participant'].email,],
+        mailformat='html',
+        ParticipantID = para['participant'].ID,
+    )
+
+def send_confirm_payment_mail(para):
+    """Confirm payment of conference fee."""
+    para['recipient'] = para['participant'] # add synonym
+    para['fee'] = config.calc_fee(para['participant'])
+    sendmail(
+        subject = '%s %s: Payment Confirmed' %(config.conference.conference_acronym, config.conference.year),
+        message = render_mail('confirm_payment.html', **para),
+        fromaddr = config.mail.registration_email,
+        to_list = (para['participant'].email,),
         mailformat='html',
         ParticipantID = para['participant'].ID,
     )
