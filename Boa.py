@@ -222,7 +222,50 @@ def collect_talks(args):
     print('Output:', os.path.join(paths.BoA, 'Talks.pdf'))
 
 parser_collect = subparsers.add_parser('collect_talks', help='collect all submitted talk abstracts in a single pdf')
-parser_part.set_defaults(func=collect_talks)
+parser_collect.set_defaults(func=collect_talks)
+
+### freeze BoA_online
+def freeze(args):
+    from flask_frozen import Freezer, MissingURLGeneratorWarning, MimetypeMismatchWarning
+    from Boa import app, core
+    from Boa.modules import config, database
+    from warnings import simplefilter as filter_warnings
+    filter_warnings('ignore', MissingURLGeneratorWarning)
+
+    app.config['FREEZER_RELATIVE_URLS'] = True
+    app.config['FREEZER_DESTINATION'] = os.path.join(config.instance_path, 'BoA_frozen')
+    app.config['FREEZER_IGNORE_MIMETYPE_WARNINGS'] = True
+
+    freezer = Freezer(app, with_no_argument_rules=False, log_url_for=False)
+
+    @freezer.register_generator
+    def static():
+        return [
+            '/BoA/',
+            '/BoA/abstractlist/',
+            '/style.css',
+            '/jquery.responsiveiframe.js',
+            '/jquery.responsiveiframe.onclick.js',
+            ]
+
+    @freezer.register_generator
+    def abstracts():
+        db_session = database.create_session()
+        abstracts = [(a.participant_id, a.label) for a in db_session.query(database.Abstract) if a.label]
+        db_session.close()
+        for ID, label in abstracts:
+            yield 'BoAonline.abstract', {'ID' : label}
+            try:
+                core.get_figure_fname(ID)
+                yield 'images_web', {'ID' : ID}
+            except IOError:
+                pass
+
+    freezer.freeze()
+    print('Output saved to:', os.path.join(config.instance_path, 'BoA_frozen'))
+
+parser_freeze = subparsers.add_parser('freeze', help='create a static version of online BoA')
+parser_freeze.set_defaults(func=freeze)
 
 ### parse args and run command
 args = parser.parse_args()

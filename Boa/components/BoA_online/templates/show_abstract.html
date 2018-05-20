@@ -19,7 +19,7 @@
 {% block body %}
 <div class="container">
     <span>{{ time_slot }}</span>
-    <span style="text-align:right; float:right;">{{ category }}</span>
+    <span style="text-align:right; float:right;">{{ label }} - {{ category }}</span>
     <h2 class="text-center">{{ title|safe }}</h2>
     {{ authaffil|safe }}
     <div class="text-justify">{{ content|safe }}</div>

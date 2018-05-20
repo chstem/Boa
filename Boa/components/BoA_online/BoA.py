@@ -12,7 +12,7 @@ from ...utils import create_parameter_dict
 
 blueprint = Blueprint('BoAonline', __name__, url_prefix='/BoA', template_folder='templates')
 
-@blueprint.route('/abstract/<ID>')
+@blueprint.route('/abstract/<ID>/')
 @cache.memoize(3600)
 def abstract(ID):
     """Show abstract as HTML."""
@@ -47,6 +47,7 @@ def abstract(ID):
     para['img_use'] = participant.abstract.img_use
     para['img_caption'] = pandoc.markdown2html(participant.abstract.img_caption)
     para['ID'] = ID
+    para['label'] = participant.abstract.label
 
     if ID != 'example':
         db_session.close()
@@ -67,10 +68,13 @@ def abstract_list():
     sessions = db_session.query(database.Session).order_by(database.Session.time_slot).all()
     para['sessions'] = []
     for session in sessions:
+        abstracts = session.get_abstracts()
+        if not abstracts:
+            continue
         session_dict = {
             'name' : session.name,
             'time' : session.time_slot,
-            'abstracts' : session.get_abstracts(),
+            'abstracts' : abstracts,
         }
         para['sessions'].append(session_dict)
     html = render_template('BoA_abstract_list.html', **para)
@@ -108,8 +112,3 @@ def TOC():
     db_session.close()
 
     return render_template('BoA.html', **para)
-
-@blueprint.route('/Greetings/')
-def Greetings():
-    para = create_parameter_dict()
-    return render_template('Greetings.html', **para)

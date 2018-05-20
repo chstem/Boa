@@ -138,7 +138,7 @@ def static(filename):
     # fallback to module's static folder
     return send_from_directory(os.path.join(config.module_path, 'static', dirname), filename)
 
-@app.route('/help')
+@app.route('/help/')
 def help_page():
     para = utils.create_parameter_dict()
     return render_template('help.html', **para)
@@ -166,7 +166,7 @@ def get_figure_fname(ID):
             if fname.startswith('figure') and (fname.rsplit('.', 1)[1].lower() in config.forms.ALLOWED_EXTENSIONS):
                 return abstract_dir, fname
 
-    raise FileNotFoundError
+    raise IOError('No file found for ID {}'.format(ID))
 
 def convert_web(dirname, fname, fname_web):
     """Convert image to a web-friendly format."""
@@ -179,14 +179,17 @@ def convert_web(dirname, fname, fname_web):
 def images(ID):
     try:
         abstract_dir, fname = get_figure_fname(ID)
-    except FileNotFoundError:
+    except IOError:
         return abort(404)
     return send_from_directory(abstract_dir, fname)
 
 @app.route('/images_web/<ID>')
 @utils.nocache
 def images_web(ID):
-    abstract_dir, fname = get_figure_fname(ID)
+    try:
+        abstract_dir, fname = get_figure_fname(ID)
+    except IOError:
+        return abort(404)
     # check for existing web-friendly version
     name, ext = fname.rsplit('.', 1)
     if ext.lower() == 'pdf':

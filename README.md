@@ -40,6 +40,7 @@ export PYTHONPATH=$HOME/Boa:$PYTHONPATH
 pip install MySQL-python    # Python2
 pip install mysqlclient     # Python3
 pip install matplotlib      # used by components/feedback, if installed
+pip install frozen_flask    # used to export a static version of BoA_online
 ```
 
 ### Configuration
