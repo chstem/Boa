@@ -3,7 +3,7 @@ from codecs import open
 import os
 from subprocess import Popen
 
-from ..modules import config
+from ..modules import config, database
 from ..modules.Email import render_mail
 
 from .contributions import *
@@ -47,3 +47,52 @@ def nocache(view):
         return response
 
     return update_wrapper(no_cache, view)
+
+## create invoices
+from time import localtime
+def create_invoice(ID):
+    db_session = database.create_session()
+    participant = db_session.query(database.Participant).get(ID)
+    assert participant.invoice_number, 'No invoice number set'
+
+    # set parameters
+    para = {
+        'firstname' : participant.firstname,
+        'lastname' : participant.lastname,
+        'title' : participant.title,
+        'institute' : participant.institute,
+        'department' : participant.department,
+        'street' : participant.street,
+        'PLZ' : participant.postal_code,
+        'city' : participant.city,
+        'invoice_no' : participant.invoice_number,
+        'tax_no' : participant.tax_number,
+        'events' : participant.events,
+        'fee' : config.calc_fee(participant),
+    }
+    for key, value in config.conference.account.__dict__.items():
+        para[key] = value
+    if config.registration.earlybird:
+        para['earlybird'] = localtime(participant.time_registered) <= config.registration.earlybird
+    else:
+        para['earlybird'] = False
+    if config.registration.surcharge:
+        para['surcharge'] = localtime() > config.registration.surcharge
+    else:
+        para['surcharge'] = False
+
+    # create tex file from template
+    with open(os.path.join(config.instance_path, 'invoice_template.tex'), encoding='utf-8') as fd:
+        template = fd.read()
+    if not os.path.isdir(os.path.join(config.instance_path, 'invoices')):
+        os.mkdir(os.path.join(config.instance_path, 'invoices'))
+    fname = os.path.join(config.instance_path, 'invoices', 'Nr_{:04d}'.format(participant.invoice_number))
+    with open(fname+'.tex', 'w', encoding='utf-8') as fd:
+        fd.write(template %para)
+    db_session.close()
+
+    # run pdflatex
+    os.chdir('invoices')
+    p = Popen(['pdflatex', fname+'.tex'])
+    p.wait()
+    os.chdir(config.instance_path)

@@ -16,6 +16,7 @@ registration.enabled = True
 registration.start = strptime('01/01/2000 00:00', '%d/%m/%Y %H:%M')        # empty string to disable
 registration.deadline = strptime('01/01/2099 13:59', '%d/%m/%Y %H:%M')     # empty string to disable
 registration.earlybird = strptime('01/01/2099 23:59', '%d/%m/%Y %H:%M')    # empty string to disable
+registration.surcharge = strptime('01/01/2099 23:59', '%d/%m/%Y %H:%M')    # empty string to disable
 registration.max_participants = 0               # 0 for infinite
 registration.reject_double_registration = True  # checks if email already in database
 registration.ranks = ['staff', 'participant']   # address required

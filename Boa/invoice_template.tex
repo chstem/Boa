@@ -1,0 +1,69 @@
+\documentclass[a4paper]{scrlttr2}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{eurosym}
+\usepackage{graphicx}
+\usepackage{etoolbox}
+\setlength\parindent{0pt}
+\setkomavar{title}{Invoice}
+
+\setkomavar{firsthead}{%%
+    HEADER
+}
+
+\begin{document}
+
+    \setkomavar{invoice}[]{Invoice No. prefix-%(invoice_no)04d}
+    \setkomavar{date}[]{\today}
+
+    \begin{letter}{%%
+            %% address
+            %(firstname)s~%(lastname)s \\
+            %(institute)s \\
+            \ifstrequal{%(department)s}{}{}{%(department)s\\}
+            %(street)s \\
+            %(PLZ)s\ %(city)s
+        }
+
+        \bigskip
+        \opening{Dear %(title)s~%(firstname)s~%(lastname)s}
+
+        we thank you for your participation at ...
+
+        \par
+        \bigskip
+
+        \begin{center}
+            \begin{tabular}{lr}
+                \hspace{9cm} & \textbf{Price} \\
+
+                Registration Fee & \euro{~%(fee)s} \\
+
+                \ifstrequal{%(earlybird)s}{True}{%%
+                    earlybird discount & \euro{~-5.00} \\
+                }
+
+            \end{tabular}
+        \end{center}
+
+
+        \ifstrequal{%(tax_no)s}{}{}{Participant's tax number: %(tax_no)s \\}
+        The fee is exempted from tax according to \S 4 No. 22a UStG (Value Added Tax Act).\\
+
+
+        \bigskip
+        Sincerely yours,\par
+        \bigskip\bigskip
+        Organisation committee of ...\\
+
+        \vfill
+        \footnotesize
+        Account holder: %(holder)s\\
+        Bank: %(bank)s\\
+        SWIFT-BIC: %(SWIFT)s\\
+        IBAN: %(IBAN)s\\
+
+    \end{letter}
+
+\end{document}

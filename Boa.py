@@ -33,6 +33,9 @@ def init(args):
             print('creating', paths.BoA)
             copytree(os.path.join(module_path, 'BoA'), paths.BoA)
 
+        if not os.path.isfile('invoice_template.tex'):
+            copy(os.path.join(module_path, 'invoice_template.tex'), 'invoice_template.tex')
+
         # create directories
         if not os.path.isdir('mail_templates'):
             os.mkdir('mail_templates')
@@ -143,6 +146,7 @@ def part(args):
     from Boa.modules.config import paths
     from Boa.modules import database as db
     from Boa.modules import export
+    from Boa.utils import create_invoice
     db_session = db.create_session()
 
     if args.cmd == 'delete':
@@ -167,6 +171,9 @@ def part(args):
 
     elif args.cmd == 'restore':
         export.import_json(args.ID)
+
+    elif args.cmd == 'invoice':
+        create_invoice(args.ID)
 
     elif args.cmd == 'send_reg_mail':
         participant = db_session.query(db.Participant).get(args.ID)
@@ -199,7 +206,7 @@ def part(args):
     db_session.close()
 
 parser_part = subparsers.add_parser('participant', help='manage participants')
-parser_part.add_argument('cmd', choices=['delete', 'restore', 'send_reg_mail', 'send_paid_mail'])
+parser_part.add_argument('cmd', choices=['delete', 'restore', 'invoice', 'send_reg_mail', 'send_paid_mail'])
 parser_part.add_argument('ID', help='participant IDs')
 parser_part.set_defaults(func=part)
 
