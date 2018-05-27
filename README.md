@@ -43,7 +43,7 @@ pip install matplotlib      # used by components/feedback, if installed
 pip install frozen_flask    # used to export a static version of BoA_online
 ```
 
-### Configuration
+### Basic Configuration
 
 - Create a new folder for your conference and use `Boa.py` to initialize configuration
 
@@ -68,42 +68,15 @@ Boa.py init database
 Boa.py test
 ```
 
+For further details please refere to the [Wiki](https://github.com/chstem/Boa/wiki).
+
+
 ### Deployment
 
 For production mode the app should be deployed to a WSGI server. See [Flask documentation](http://flask.pocoo.org/docs/1.0/deploying/) for more details.
 
 What you essentially need to do, is to import the `app` object from the `Boa` module. Make sure your instance directory (`myconference`) is the current working directory during the Python import.
 
-
-### Important Endpoints
-
-The server application provides the following main endpoints:
-
-- `/register`
-- `/abstract_submission`
-- `/BoA`
-- `/tools`
-
-Furthermore links like `/register/staff` may be used to automatically set the rank field of a participant, provided the corresponding rank is specified in `preferences/config.py`. Further endpoints depend on the enabled components (features).
-
-### Embed webpages with iframes
-
-The endpoints may be embedded into an existing conference website using iframes. This is mainly of interest for Registration and Abstract Submission. To automatically match the iframe's height, some javascript is required, e.g.:
-
-```
-<iframe src="<URL>/register" id="iframe1"  style="width: 100%;"frameborder="0" scrolling="no"></iframe>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="<URL>/static/jquery.responsiveiframe.onclick.js"></script>
-<script>
-    ;(function($){
-        $(function(){
-        $('#iframe1').responsiveIframe({ xdomain: '*'});
-        });
-    })(jQuery);
-</script>
-```
-
-Don't forget to replace the two `<URL>` placeholders.
 
 ### License
 
