@@ -727,7 +727,7 @@ def create_preview():
                 db_session.close()
 
             # check supplied data (redundant)
-            problems = export.check_abstract(ID)
+            problems = export.abstract.check_abstract(ID)
 
             if problems:
                 para = utils.create_parameter_dict(problems=problems)
@@ -844,7 +844,7 @@ def show_preview():
         db_session.close()
 
         try:
-            para['tex_log'] = export.check_log(ID)
+            para['tex_log'] = export.abstract.check_log(ID)
         except UnicodeDecodeError:
             app.logger.warning('Error reading logfile for ID %s\n%s' %(ID, sys.exc_info()[0]))
             para['tex_log'] = 'Error reading logfile'

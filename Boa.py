@@ -87,56 +87,54 @@ parser_run.set_defaults(func=run)
 
 ### database exports
 def export(args):
-    from Boa.modules.config import paths
-    from Boa.modules import database as db
     from Boa.modules import export
-    from codecs import open
-    db_session = db.create_session()
 
     if args.cmd == 'abstract':
         if not args.ID:
             print('abstract ID required')
         else:
-            export.write_tex(args.ID, mask_email=args.mask_email)
+            export.abstract.write_tex(args.ID, mask_email=args.mask_email)
 
     elif args.cmd == 'abstracts':
         # export all abstracts
+        from Boa.modules import database
+        db_session = db.create_session()
         abstracts = db_session.query(db.Abstract).all()
         IDs = [abstract.participant.ID for abstract in abstracts if abstract.is_submitted]
         for ID in IDs:
-            export.write_tex(ID, mask_email=args.mask_email)
+            export.abstract.write_tex(ID, mask_email=args.mask_email)
+        db_session.close()
 
     elif args.cmd == 'index':
-        export.index()
+        export.program.index()
 
     elif args.cmd == 'posters':
-        export.posters()
+        export.program.posters()
 
     elif args.cmd == 'talks':
-        export.talks()
+        export.program.talks()
 
     elif args.cmd == 'timetable':
-        export.timetable()
+        export.program.timetable()
 
     elif args.cmd == 'invoices':
-        # export invoice data
-        raise NotImplementedError
+        # export invoice data to csv
+        export.invoice_data()
 
     elif args.cmd == 'nametags':
-        # export data for name tags
-        raise NotImplementedError
+        # create name tags
+        export.nametags()
 
-    elif args.cmd == 'posternumbers':
-        # numbers for poster walls
-        raise NotImplementedError
+    elif args.cmd == 'posterbadges':
+        # create numbers for poster walls
+        export.poster_badges()
 
-    db_session.close()
 
 parser_export = subparsers.add_parser('export', help='database exports')
 parser_export.add_argument('cmd', choices=[
     'abstract', 'abstracts',
     'index', 'posters', 'talks', 'timetable',
-    'invoices', 'nametags', 'posternumbers',])
+    'invoices', 'nametags', 'posterbadges',])
 parser_export.add_argument('-d', '--ID', help='abstract ID', default='')
 parser_export.add_argument('--mask_email', help='replace @ with [at]', action='store_true')
 parser_export.set_defaults(func=export)
@@ -146,7 +144,6 @@ def part(args):
     from Boa.modules.config import paths
     from Boa.modules import database as db
     from Boa.modules import export
-    from Boa.utils import create_invoice
     db_session = db.create_session()
 
     if args.cmd == 'delete':
@@ -155,7 +152,7 @@ def part(args):
             print('ID {} not found'.format(args.ID))
             return
         print('creating JSON backup')
-        export.export_to_json(args.ID)
+        export.participant.export_to_json(args.ID)
         print('deleting abstract directory')
         if os.path.isdir(os.path.join(paths.abstracts,ID)):
             from shutil import rmtree
@@ -170,10 +167,10 @@ def part(args):
             raise
 
     elif args.cmd == 'restore':
-        export.import_json(args.ID)
+        export.participant.import_json(args.ID)
 
     elif args.cmd == 'invoice':
-        create_invoice(args.ID)
+        export.participant.create_invoice(args.ID)
 
     elif args.cmd == 'send_reg_mail':
         participant = db_session.query(db.Participant).get(args.ID)
@@ -214,7 +211,7 @@ parser_part.set_defaults(func=part)
 def collect_talks(args):
     from Boa.modules import database as db
     from Boa.modules.config import paths
-    from Boa.modules.export import export_abstract
+    from Boa.modules.export.abstract import export_abstract
     from Boa.utils import make_preview
     from subprocess import Popen
 
@@ -254,16 +251,17 @@ def freeze(args):
     app.config['FREEZER_DESTINATION'] = os.path.join(config.instance_path, 'BoA_frozen')
     app.config['FREEZER_IGNORE_MIMETYPE_WARNINGS'] = True
 
-    freezer = Freezer(app, with_no_argument_rules=False, log_url_for=False)
+    freezer = Freezer(app, with_static_files=False, with_no_argument_rules=False, log_url_for=False)
 
     @freezer.register_generator
     def static():
         return [
             '/BoA/',
             '/BoA/abstractlist/',
-            '/style.css',
+            '/favicon.ico',
             '/jquery.responsiveiframe.js',
             '/jquery.responsiveiframe.onclick.js',
+            '/style.css',
             ]
 
     @freezer.register_generator

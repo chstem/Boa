@@ -1,0 +1,54 @@
+\documentclass[a4paper,12pt]{letter}
+\usepackage[total={210mm,297mm},top=0mm,left=0mm, includefoot]{geometry}
+\usepackage{ticket}
+\unitlength=1mm
+\hoffset=-4mm
+\voffset=-16mm
+\ticketNumbers{2}{5}
+\ticketSize{84}{53}     % unitlength mm
+\ticketDistance{0}{0}   % unitlength mm
+\usepackage{graphicx,palatino,marvosym}
+\usepackage{etoolbox}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+\usepackage{xcolor}
+\usepackage{datatool}
+\renewcommand{\ticketdefault}{}%
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\makeatletter
+\@emptycrossmarkfalse
+\@cutmarkfalse
+\@boxedtrue
+\makeatother
+
+% define Name Tag (ticket)
+\definecolor{mygreen}{HTML}{25c534}
+\newcommand{\nametag}[4]{\ticket{%
+
+    % Head
+    \put(0,40){\colorbox{mygreen}{\makebox(82,13){}}}
+    \put(0,47.5){\begin{minipage}[t]{82mm} \centering \bfseries \textcolor{white}{\textsc{
+            Conference Name \\
+        }} \end{minipage}}
+
+    % Name, Title, Institute
+    \put(4,25){\scalebox{1.3}{\textbf{#1}}}
+    \put(4,31){#2}
+    \put(4,20){\begin{minipage}[t]{80mm} \small \flushleft #3 \end{minipage}}
+
+    % Staff
+    \ifdefstring{#4}{staff}{\put(70,31){\textcolor[rgb]{0.7,0,0}{\textbf{\textsc{Staff}}}}}{}
+    \typeout{done #1}
+}}
+
+\begin{document}
+
+\DTLsetseparator{;}
+\DTLloaddb{list1}{name_tags.csv}
+\DTLforeach{list1}{\first=firstname,\last=lastname,\title=title,\institute=institute,\staff=staff}{
+    \nametag{\first\ \last}{\title}{\institute}{\staff}
+}
+
+\end{document}

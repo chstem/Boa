@@ -209,8 +209,8 @@ def fix_markdown(participant):
     return participant
 
 def make_preview(ID, halt_latex=True):
-    export.cycle_files(ID)
-    export.write_tex(ID)
+    export.abstract.cycle_files(ID)
+    export.abstract.write_tex(ID)
     cmd = ['bash', os.path.join(config.paths.BoA,'make_preview.sh'), '-d', ID]
     if halt_latex:
         cmd.append('-h')

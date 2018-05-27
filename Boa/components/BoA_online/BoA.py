@@ -41,7 +41,7 @@ def abstract(ID):
     para['time_slot'] = participant.abstract.time_slot
     para['category'] = participant.abstract.category
     para['title'] = pandoc.markdown2html(participant.abstract.title)
-    para['authaffil'] = export.build_authaffil(participant, format='html')
+    para['authaffil'] = export.abstract.build_authaffil(participant, format='html')
     para['content'] = content[:ind] if ind >= 0 else content
     para['footnotes'] = content[ind:] if ind >= 0 else ''
     para['img_use'] = participant.abstract.img_use

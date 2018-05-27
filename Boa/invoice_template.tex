@@ -20,8 +20,8 @@
     \begin{letter}{%%
             %% address
             %(firstname)s~%(lastname)s \\
-            %(institute)s \\
-            \ifstrequal{%(department)s}{}{}{%(department)s\\}
+            %(address_line1)s \\
+            \ifstrequal{%(address_line2)s}{}{}{%(address_line2)s\\}
             %(street)s \\
             %(PLZ)s\ %(city)s
         }
