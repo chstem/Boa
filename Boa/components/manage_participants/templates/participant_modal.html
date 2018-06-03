@@ -1,0 +1,25 @@
+{% import  "formhelpers.html" as formhelpers %}
+<h2>Edit Participant</h2>
+
+<form id="form" action="{{ url_for('manage_participants.save') }}" method="post" class="form-horizontal" role="form">
+    {{ form.hidden_tag() }}
+    {{ formhelpers.render_field(form.ID, type='hidden', hide_label=True) }}
+    {{ formhelpers.render_field(form.ID, disabled=True) }}
+    {{ formhelpers.render_field(form.title) }}
+    {{ formhelpers.render_field(form.firstname) }}
+    {{ formhelpers.render_field(form.lastname) }}
+    {{ formhelpers.render_field(form.institute) }}
+    {{ formhelpers.render_field(form.contribution) }}
+    {{ formhelpers.render_field(form.registered, disabled=True) }}
+    {{ formhelpers.render_field(form.rank) }}
+    {{ formhelpers.render_field(form.events) }}
+    {{ formhelpers.render_field(form.invoice_number) }}
+    {{ formhelpers.render_field(form.payment_confirmed, disabled=True) }}
+
+    {{ formhelpers.start_wrap() }}
+    {{ formhelpers.render_checkbox(form.paid, inline=True) }}
+    {{ formhelpers.render_checkbox(form.send_confirm, inline=True) }}
+    {{ formhelpers.render_checkbox(form.attach_invoice, inline=True) }}
+    {{ formhelpers.end_wrap() }}
+
+</form>

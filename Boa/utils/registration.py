@@ -68,7 +68,7 @@ def send_reg_mail(para):
         ParticipantID = para['participant'].ID,
     )
 
-def send_confirm_payment_mail(para):
+def send_confirm_payment_mail(para, attachments=[]):
     """Confirm payment of conference fee."""
     para['recipient'] = para['participant'] # add synonym
     para['fee'] = config.calc_fee(para['participant'])
@@ -78,5 +78,6 @@ def send_confirm_payment_mail(para):
         fromaddr = config.mail.registration_email,
         to_list = (para['participant'].email,),
         mailformat='html',
+        attachments = attachments,
         ParticipantID = para['participant'].ID,
     )

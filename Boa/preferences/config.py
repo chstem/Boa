@@ -87,7 +87,6 @@ def calc_fee(participant):
 #############################
 
 mail.enable = False                                     # maybe disable this for testing
-mail.confirm_payment = True                             # send mail to participant, when marked as paid
 mail.error_email = 'admin@example.com'                  # on error, send an email to this address
 mail.registration_email = 'registration@example.com'    # will appear as 'sender' in mails
 mail.SENDMAIL = '/usr/sbin/sendmail'                    # sendmail location, try:  '/usr/lib/sendmail' or '/usr/sbin/sendmail' or use 'SMTP'

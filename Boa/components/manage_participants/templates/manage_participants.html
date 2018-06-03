@@ -1,4 +1,47 @@
 {% extends "layout.html" %}
+
+{% block head %}
+<style>
+    /* Modal (background) */
+    .modal {
+        display: none;                      /* Hidden by default */
+        position: fixed;                    /* Stay in place */
+        z-index: 1;                         /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;                     /* Enable scroll if needed */
+        background-color: rgb(0,0,0);       /* Fallback color */
+        background-color: rgba(0,0,0,0.4);  /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;                   /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 
 <div class="container">
@@ -8,7 +51,7 @@
 </div>
 
 <div class="container">
-    <form action="{{ url_for('manage_participants.show', action='filter') }}" method="post" class="form-horizontal" role="form">
+    <form method="post" class="form-horizontal" role="form">
 
         {{ form.hidden_tag() }}
         {{ form.btest(class='btest') }}
@@ -47,80 +90,54 @@
 
             <div class="row">
                 <div class="col-sm-10">
-                    <h4 class="text-center">total: {{ form.participants|length }}</h4>
-                </div>
-                <div class="col-sm-2 center-block">
-                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_participants.show', action='save') }}">Save</button>
+                    <h4 class="text-center">total: {{ participants|length }}</h4>
                 </div>
             </div>
 
-            <!-- table head -->
-            <div class="row">
-                <label class="col-sm-1">ID</label>
-                <label class="col-sm-2">Name</label>
-                <label class="col-sm-2">Institute/University</label>
-                <label class="col-sm-1">Events</label>
-                <label class="col-sm-1">Contribution</label>
-                <label class="col-sm-1">Rank</label>
-                <label class="col-sm-1">Registered</label>
-                {#<label class="col-sm-1">Payment Confirmed</label>#}
-                <label class="col-sm-1">Fee (&euro;)</label>
-                <label class="col-sm-1">Invoice No.</label>
-                <label class="col-sm-1"></label>
-            </div>
+            <!-- participants list -->
+            <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Institute/University</th>
+                    <th>Rank</th>
+                    <th>Events</th>
+                    <th>Contribution</th>
+                    <th>Registered</th>
+                    <th>Paid</th>
+                    <th>Payment Confirmed</th>
+                    <th>Fee (&euro;)</th>
+                    <th>Invoice No.</th>
+                    <th></th>
+                </tr>
+            </thead>
 
-            <br />
-            <br />
-
-            <!-- table data -->
-            {% for participant in form.participants %}
-
-                <div class="row">
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.ID, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    <div class="col-sm-2">
-                        {{ formhelpers.render_field(participant.fullname, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    <div class="col-sm-2">
-                        {{ formhelpers.render_field(participant.institute, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.events, hide_label=True, wrapped=False) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.contribution, hide_label=True, wrapped=False) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.rank, hide_label=True, wrapped=False) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.registered, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    {#
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.payment_confirmed, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    #}
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.fee, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_field(participant.invoice_number, hide_label=True, wrapped=False, readonly=True) }}
-                    </div>
-                    <div class="col-sm-1">
-                        {{ formhelpers.render_checkbox(participant.paid, inline=True) }}
-                    </div>
-                </div>
-
-            {% endfor %}
+            <tbody>
+               {% for p in participants %}
+                    <tr id="{{ p['id'] }}">
+                        <td>{{ p['id'] }}</td>
+                        <td name="name">{{ p['name'] }}</td>
+                        <td name="institute">{{ p['institute'] }}</td>
+                        <td name="rank">{{ p['rank'] }}</td>
+                        <td name="events">{{ p['events'] }}</td>
+                        <td name="contribution">{{ p['contribution'] }}</td>
+                        <td>{{ p['registered'] }}</td>
+                        <td name="paid">{{ p['paid'] }}</td>
+                        <td name="payment_confirmed">{{ p['payment_confirmed'] }}</td>
+                        <td>{{ p['fee'] }}</td>
+                        <td name="invoice_no">{{ p['invoice_no'] }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="edit('{{ p['id'] }}')">edit</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            </table>
 
             <div class="row">
                 <div class="col-sm-10">
-                    <h4 class="text-center">total: {{ form.participants|length }}</h4>
-                </div>
-                <div class="col-sm-2 center-block">
-                    <button type="submit" class="btn btn-primary" formaction="{{ url_for('manage_participants.show', action='save') }}">Save</button>
+                    <h4 class="text-center">total: {{ participants|length }}</h4>
                 </div>
             </div>
 
@@ -128,4 +145,66 @@
 
     </form>
 </div>
+
+<!-- Edit Modal -->
+<div id="editmodal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="modal"></div>
+    <button type="button" class="btn btn-primary" onclick="save()">Save</button>
+    <button type="button" class="btn btn-primary" onclick="close_modal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+    var modal = document.getElementById('editmodal');
+    var span = document.getElementsByClassName('close')[0];
+
+    // open the edit modal
+    function edit(ID) {
+        $.ajax({
+            type: 'GET',
+            success: function (data) {
+                modal.style.display = 'block';
+                $('#modal').html(data);
+            },
+            url: "{{ url_for('manage_participants.edit', ID='ID') }}".replace('ID', ID),
+            cache: false
+        });
+    }
+
+    // send form and close the edit modal
+    function save() {
+        $.ajax({
+            type: 'POST',
+            data: $("#form").serialize(),
+            success: function (data) {
+                // close modal
+                close_modal()
+                // update row in table
+                Object.keys(data).forEach(function (key) {
+                    $('#'+data['id']).find('[name='+key+']').html(data[key]);
+                });
+            },
+            url: "{{ url_for('manage_participants.save') }}",
+            cache: false
+        });
+    }
+
+    // close the edit modal
+    function close_modal() {
+        modal.style.display = 'none';
+    }
+
+    // click on <span> (x) closes the modal
+    span.onclick = close_modal
+
+    // clicking anywhere outside of the modal closes it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            close_modal()
+        }
+    }
+</script>
+
 {% endblock %}

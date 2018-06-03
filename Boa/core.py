@@ -792,8 +792,7 @@ def _preview_progress():
         return jsonify(latex='done')
 
     ID = session['ID_submission']
-
-    if os.path.isfile(os.path.join(config.paths.abstracts,ID,ID+'.log')):
+    if os.path.isfile(os.path.join(config.paths.abstracts, ID, ID+'.log')):
         return jsonify(latex='done')
 
     return jsonify(latex='running')
