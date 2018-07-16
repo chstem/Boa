@@ -171,6 +171,8 @@ def edit(ID):
     participant = db_session.query(database.Participant).get(ID)
     if not participant:
         current_app.logger.warning('manage participants (edit): ID not found: ' + ID)
+        db_session.close()
+        return abort(400)   # Bad Request
 
     # create and populate form
     rank_choices = [(rank, rank) for rank in get_ranks()]
@@ -196,6 +198,7 @@ def edit(ID):
     if participant.payment_confirmed:
         form.payment_confirmed.data = time.strftime('%d/%m/%Y', time.localtime(participant.payment_confirmed))
 
+    db_session.close()
     return render_template('participant_modal.html', form=form)
 
 @blueprint.route('/save/', methods=['POST'])
