@@ -143,10 +143,19 @@ def import_json(ID, change_ID=None):
 ###  Invoices  ###
 ##################
 
-def create_invoice(ID):
+def create_invoice(ID, overwrite=False):
     db_session = create_session()
     participant = db_session.query(Participant).get(ID)
-    assert participant.invoice_number, 'No invoice number set'
+    if not participant.invoice_number:
+        invoice_no = db_session.query(Participant)\
+            .order_by(Participant.invoice_number.desc()).first().invoice_number
+        if not invoice_no: invoice_no = 0
+        participant.invoice_number = invoice_no + 1
+        db_session.commit()
+
+    fname = os.path.join(config.instance_path, 'invoices', 'Nr_{:04d}'.format(participant.invoice_number))
+    if os.path.isfile(fname+'.pdf') and not overwrite:
+        return fname + '.pdf'
 
     # set parameters
     para = {
@@ -179,7 +188,6 @@ def create_invoice(ID):
         template = fd.read()
     if not os.path.isdir(os.path.join(config.instance_path, 'invoices')):
         os.mkdir(os.path.join(config.instance_path, 'invoices'))
-    fname = os.path.join(config.instance_path, 'invoices', 'Nr_{:04d}'.format(participant.invoice_number))
     with open(fname+'.tex', 'w', encoding='utf-8') as fd:
         fd.write(template %para)
     db_session.close()

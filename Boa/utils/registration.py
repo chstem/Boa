@@ -55,7 +55,7 @@ def registration_isclosed():
 ###  notification emails  ###
 #############################
 
-def send_reg_mail(para):
+def send_reg_mail(para, attachments=[]):
     """Send mail to newly registered participant."""
     para['recipient'] = para['participant'] # add synonym
     para['fee'] = config.calc_fee(para['participant'])
@@ -66,6 +66,7 @@ def send_reg_mail(para):
         to_list = [para['participant'].email,],
         mailformat='html',
         ParticipantID = para['participant'].ID,
+        attachments = attachments,
     )
 
 def send_confirm_payment_mail(para, attachments=[]):

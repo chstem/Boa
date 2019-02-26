@@ -24,6 +24,7 @@ registration.ranks_invited = ['invited',]       # no address fields
 registration.ranks_hidden = ['second_contribution',]
 registration.keep_open = ['staff', 'invited']   # keep registration always open for these ranks
 registration.events = []                        # list of main events where independent registration is possible; empty for only one option
+registration.attach_invoice = ['participant',]  # attach invoice to registration confirmed mail
 
 submission.enabled = True
 submission.start = strptime('01/01/2000 00:00', '%d/%m/%Y %H:%M')               # empty string to disable

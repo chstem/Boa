@@ -192,7 +192,7 @@ def edit(ID):
         invoice_number = participant.invoice_number,
         fee = config.calc_fee(participant),
         send_confirm = session.get('send_confirm', True),
-        attach_invoice = session.get('attach_invoice', True),
+        attach_invoice = session.get('attach_invoice', False),
         )
 
     if participant.payment_confirmed:

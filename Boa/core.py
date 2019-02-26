@@ -428,8 +428,17 @@ def register(rank='participant'):
 
         # send confirmation email
         if rank in config.registration.ranks and not onsite:
+
             para['participant'] = participant
-            utils.send_reg_mail(para)
+
+            if config.registration.attach_invoice and rank in config.registration.attach_invoice:
+                # TODO: run in separate thread
+                fname_invoice = export.participant.create_invoice(participant.ID)
+                utils.send_reg_mail(para, attachments=[fname_invoice,])
+
+            else:
+                # send confirmation email
+                utils.send_reg_mail(para)
 
         db_session.close()
 
