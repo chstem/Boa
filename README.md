@@ -82,4 +82,4 @@ What you essentially need to do, is to import the `app` object from the `Boa` mo
 
 Licensed under GNU GPLv3
 
-Copyright (C) 2018, Christian Stemmle
+Copyright (C) 2019, Christian Stemmle
