@@ -363,7 +363,10 @@ def register(rank='participant'):
             contribution = form.contribution.data
         elif set(events.split(',')) & set(config.submission.events):
             # only if registering for event with submission
-            contribution = form.contribution.data
+            try:
+	            contribution = form.contribution.data
+            except AttributeError:
+                contribution = 'None'
         else:
             contribution = 'None'
 
