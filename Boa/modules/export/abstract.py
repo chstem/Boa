@@ -132,8 +132,26 @@ def write_tex(ID, mask_email=False):
     db_session = create_session()
 
     if ID == 'example':
-        from modules.abstract_example import participant
-        copy('preferences/abstract_example_figure.pdf', os.path.join(target_dir,'figure.pdf'))
+        from ..abstract_example import participant
+
+        # search figure in instance preferences
+        figurename = ''
+        if config.prefs_instance:
+            for fname in os.listdir(config.prefs_instance):
+                if fname.startswith('abstract_example_figure.') and (fname.rsplit('.', 1)[1].lower() in config.forms.ALLOWED_EXTENSIONS):
+                    figurename = os.path.join(config.prefs_instance, fname)
+                    break
+
+        # search figure in defaults preferences
+        if not figurename:
+            for fname in os.listdir(config.prefs_default):
+                if fname.startswith('abstract_example_figure.') and (fname.rsplit('.', 1)[1].lower() in config.forms.ALLOWED_EXTENSIONS):
+                    figurename = os.path.join(config.prefs_default, fname)
+                    break
+
+        if figurename:
+            copy(figurename, os.path.join(target_dir, 'figure.'+fname.rsplit('.', 1)[1].lower()))
+
     else:
         participant = db_session.query(Participant).get(ID)
 
@@ -169,7 +187,7 @@ def write_tex(ID, mask_email=False):
         'img_use' : ('false', 'true')[participant.abstract.img_use],
         'img_width' : float(participant.abstract.img_width)/100,
         'img_caption' : participant.abstract.img_caption,
-        'time' : participant.abstract.time_slot.replace('-', '--'),
+        'time' : participant.abstract.time_slot.replace('-', '--') if  participant.abstract.time_slot else '',
         'label' : participant.abstract.label,
         'title' : pandoc.markdown2latex(participant.abstract.title),
         'authoraffil' : authoraffil,

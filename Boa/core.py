@@ -47,7 +47,7 @@ app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
 if config.is_instance:
-    # prefere instance specific templates
+    # prefer instance specific templates
     app.jinja_loader.searchpath.insert(0, os.path.join(config.instance_path, 'templates'))
 
 ##############################
@@ -482,7 +482,7 @@ def abstract_submission_login(restricted=''):
 
         # get participant
         if ID == 'example':
-            from abstract_example import participant
+            from .modules.abstract_example import participant
         else:
             db_session = database.create_session()
             participant = db_session.query(database.Participant).get(ID)
@@ -533,7 +533,7 @@ def abstract_submission_check_login(ID):
 
     # get participant
     if ID == 'example':
-        from abstract_example import participant
+        from .modules.abstract_example import participant
     else:
         participant = db_session.query(database.Participant).get(ID)
 
@@ -588,7 +588,7 @@ def abstract_submission():
 
     # get participant
     if ID == 'example':
-        from abstract_example import participant
+        from .modules.abstract_example import participant
     else:
         db_session = database.create_session()
         participant = db_session.query(database.Participant).get(ID)
@@ -709,7 +709,7 @@ def create_preview():
 
     # get participant
     if ID == 'example':
-        from abstract_example import participant
+        from .modules.abstract_example import participant
     else:
         db_session = database.create_session()
         participant = db_session.query(database.Participant).get(ID)
