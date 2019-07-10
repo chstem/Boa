@@ -38,6 +38,8 @@ def abstract(ID):
     para = create_parameter_dict()
     content = pandoc.markdown2html(participant.abstract.content)
     ind = content.rfind('<div class="footnotes">')
+    if ind == -1:
+        ind = content.rfind('<section class="footnotes">')
     para['time_slot'] = participant.abstract.time_slot
     para['category'] = participant.abstract.category
     para['title'] = pandoc.markdown2html(participant.abstract.title)
