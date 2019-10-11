@@ -25,13 +25,13 @@ def talks():
             fd.write('\n')
             fd.write('%%%%{:s}\n'.format(session.name))
             fd.write('\\phantomsection\n')
-            fd.write('\\addcontentsline{{toc}}{{subsubsection}}{{{:s}}}\n'.format(session.name))
+            fd.write('\\addcontentsline{{toc}}{{subsection}}{{{:s}}}\n'.format(session.name))
             fd.write('\n')
 
             for abstract in abstracts:
                 fd.write('%% {:s}: {:s}\n'.format(abstract.category, abstract.title))
                 fd.write('\\phantomsection\n')
-                fd.write('\\addcontentsline{{toc}}{{paragraph}}{{{:s} : {:s}}}\n'.format(abstract.time_slot, abstract.participant.fullnamel))
+                fd.write('\\addcontentsline{{toc}}{{subsubsection}}{{{:s} : {:s}}}\n'.format(abstract.time_slot, abstract.participant.fullnamel))
                 fd.write('\\includeabstract{{{:s}}}\n'.format(abstract.participant_id))
                 fd.write('\n')
 
@@ -75,24 +75,20 @@ def timetable():
         for session in sessions:
             if session.type == 'talk':
                 abstracts = session.get_abstracts()
-                if len(abstracts) == 1:
-                    title = '{} {}'.format(session.name, abstracts[0].participant.titlename)
-                    writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(abstracts[0].time_slot, title))
-                elif abstracts:
-                    writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(session.time_slot, session.name))
-                    for abstract in abstracts:
-                        # name + institute
-                        line = '{:s} ({:s})'.format(abstract.participant.titlename, abstract.participant.institute)
-                        # parbox
-                        line = '\\parbox[t]{{0.6\\textwidth}}{{\\raggedright {:s}}}'.format(line)
-                        # add time
-                        line = '{{{:s}}} : {:s}'.format(abstract.time_slot, line)
-                        # hyperref
-                        line = ' \\hyperref[{:s}]{{{:s}}}'.format(abstract.participant_id, line)
-                        # tabular
-                        line = '    & \\normalsize ' + line
-                        # write to file
-                        writeline(fd, line)
+                writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(session.time_slot, session.name))
+                for abstract in abstracts:
+                    # name + institute
+                    line = '{:s} ({:s})'.format(abstract.participant.titlename, abstract.participant.institute)
+                    # parbox
+                    line = '\\parbox[t]{{0.6\\textwidth}}{{\\raggedright {:s}}}'.format(line)
+                    # add time
+                    line = '{{{:s}}} : {:s}'.format(abstract.time_slot, line)
+                    # hyperref
+                    line = ' \\hyperref[{:s}]{{{:s}}}'.format(abstract.participant_id, line)
+                    # tabular
+                    line = '    & \\normalsize ' + line
+                    # write to file
+                    writeline(fd, line)
             else:
                 writeline(fd, '{:s} & \\textbf{{{:s}}}'.format(session.time_slot, session.name))
 

@@ -24,25 +24,12 @@
 
     {% for session in sessions %}
 
-        {% if session.abstracts|length == 1 %}
-
-            {% set a = session.abstracts[0] %}
-            <h4>
-                <a href="{{ url_for('BoAonline.abstract', ID=a.label) }}">{{ a.label }}</a>
-                {{ a.time_slot if a.time_slot }}
-                {{ a.participant.fullname }}: {{ a.title|markdown|safe }}
-            </h4>
-
-        {% else %}
-
-            <h3>{{ utils.make_heading(session['name'], session['time']) }}</h3>
-            <ul>
-            {% for a in session['abstracts'] %}
-                <li><a href="{{ url_for('BoAonline.abstract', ID=a.label) }}">{{ a.label }} </a> {{ a.participant.fullname }}: {{ a.title|markdown|safe }}</li>
-            {% endfor %}
-            </ul>
-
-        {% endif %}
+        <h3>{{ utils.make_heading(session['name'], session['time']) }}</h3>
+        <ul>
+        {% for a in session['abstracts'] %}
+            <li><a href="{{ url_for('BoAonline.abstract', ID=a.label) }}">{{ a.label }} </a> {{ a.participant.fullname }}: {{ a.title|markdown|safe }}</li>
+        {% endfor %}
+        </ul>
 
     {% endfor %}
 

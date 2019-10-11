@@ -24,7 +24,7 @@ else:
     collation = ''
 
 def toascii(ustr):
-    return normalize('NFKD',ustr).encode('ascii', 'ignore')
+    return normalize('NFKD', ustr).encode('ascii', 'ignore')
 
 create_session = sessionmaker(bind=engine)
 
@@ -76,7 +76,7 @@ class Participant(BaseData):
 
     @property
     def titlename(self):
-        if self.title in ('Dr.', 'Prof.'):
+        if 'Dr.' in self.title or 'Prof.' in self.title:
             return '%s %s %s' %(self.title, self.firstname, self.lastname)
         else:
             return self.fullname

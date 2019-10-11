@@ -94,7 +94,7 @@ def TOC():
     # get all Talks
     talks = db_session.query(database.Abstract).join(database.Participant)\
         .filter(database.Participant.contribution == 'Talk')\
-        .order_by(database.Abstract.label)
+        .order_by(database.Abstract.time_slot)
 
     para['sections'].append({
         'name' : 'Talks',

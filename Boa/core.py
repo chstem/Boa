@@ -419,6 +419,10 @@ def register(rank='participant'):
                         abstract = None,
                         )
 
+        if onsite:
+            participant.paid = True
+            participant.payment_confirmed = time.time()
+
         try:
             db_session.add(participant)
             db_session.commit()
@@ -430,7 +434,7 @@ def register(rank='participant'):
         para['ID'] = participant.ID
 
         # send confirmation email
-        if rank in config.registration.ranks and not onsite:
+        if rank in config.registration.ranks:
 
             para['participant'] = participant
 
@@ -782,8 +786,8 @@ def create_preview():
         invited = participant.rank in config.registration.ranks_invited,
         )
     para['ID'] = participant.ID
-    para['figure_available'] = figure_available(ID)
-    para['portrait_available'] = portrait_available(ID)
+    para['figure_available'] = utils.figure_available(ID)
+    para['portrait_available'] = utils.portrait_available(ID)
 
     if ID != 'example':
         db_session.close()

@@ -88,6 +88,7 @@ parser_run.set_defaults(func=run)
 ### database exports
 def export(args):
     from Boa.modules import export
+    from Boa.modules import database as db
 
     if args.cmd == 'abstract':
         if not args.ID:
@@ -154,9 +155,9 @@ def part(args):
         print('creating JSON backup')
         export.participant.export_to_json(args.ID)
         print('deleting abstract directory')
-        if os.path.isdir(os.path.join(paths.abstracts,ID)):
+        if os.path.isdir(os.path.join(paths.abstracts, args.ID)):
             from shutil import rmtree
-            rmtree(os.path.join(paths.abstracts,ID))
+            rmtree(os.path.join(paths.abstracts, args.ID))
         print('deleting from database')
         db_session.delete(participant)
         try:

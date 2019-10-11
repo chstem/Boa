@@ -142,7 +142,7 @@ def sendmail(subject, message, fromaddr, to_list=[], cc_list=[], bcc_list=[], ma
             SMTP_connection.ehlo()
 
         SMTP_connection.login(config.mail.SMTPUsername, config.mail.SMTPPassword)
-        SMTP_connection.sendmail(fromaddr, to_list+cc_list+bcc_list, msg.as_string())
+        SMTP_connection.sendmail(fromaddr, list(to_list)+list(cc_list)+list(bcc_list), msg.as_string())
         SMTP_connection.quit()
 
     else:
